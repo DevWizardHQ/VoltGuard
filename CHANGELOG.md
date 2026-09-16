@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-16
+
 ### Fixed
 
 - The Settings ▸ Alerts tab was broken: `HSplitView` collapsed the rule list
@@ -79,5 +81,6 @@ System Settings ▸ Privacy & Security ▸ Open Anyway.
   before anything can be published.
 - A documentation site published to GitHub Pages alongside the appcast.
 
-[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.1
 [0.1.0]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.0
