@@ -6,6 +6,12 @@ on:
     paths:
       - "site/**"
       - ".github/workflows/pages.yml"
+  # The release workflow commits the signed appcast with GITHUB_TOKEN, and
+  # GitHub does not raise a push event for that, so the deploy has to be
+  # chained off the release run completing instead.
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
   workflow_dispatch:
 
 # The only workflow that deploys Pages. A second deployer would replace the
@@ -28,6 +34,9 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          # workflow_run starts from the tag; the appcast is committed to main.
+          ref: main
 
       - name: Check the appcast is present and well-formed
         run: |
