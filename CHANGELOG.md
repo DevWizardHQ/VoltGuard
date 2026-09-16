@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-16
+
+First release. Signed with the DevWizardHQ stable identity and **not
+notarized**, so on first launch macOS asks you to allow it through
+System Settings ▸ Privacy & Security ▸ Open Anyway.
+
 ### Added
 
 - Monitoring engine over IOKit `IOPowerSources`, event driven with a coalescing
@@ -37,4 +43,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   before anything can be published.
 - A documentation site published to GitHub Pages alongside the appcast.
 
-[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/commits/main
+[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.0
