@@ -2,7 +2,13 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>VoltGuard</title>
-        <description>VoltGuard updates</description>
-        <language>en</language>
+        <item>
+            <title>0.1.0</title>
+            <pubDate>Wed, 16 Sep 2026 08:18:38 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>0.1.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/DevWizardHQ/VoltGuard/releases/latest/download/VoltGuard.zip" length="2422057" type="application/octet-stream" sparkle:edSignature="kIDWV3Guq+u8CYgJAaMKIqp1gkqfv1eVmPCthaWEpWqRwArs3EvX9CHnyHB0f2pS6B2NbFZQwmFPs2JDmEw4BQ=="/>
+        </item>
     </channel>
 </rss>
