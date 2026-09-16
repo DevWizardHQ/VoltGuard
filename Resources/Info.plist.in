@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>VoltGuard</string>
+    <key>CFBundleDisplayName</key>
+    <string>VoltGuard</string>
+    <key>CFBundleExecutable</key>
+    <string>VoltGuard</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.devwizardhq.voltguard</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>__VERSION__</string>
+    <key>CFBundleVersion</key>
+    <string>__BUILD__</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>© DevWizardHQ. MIT licensed.</string>
+    <key>NSSupportsAutomaticTermination</key>
+    <false/>
+    <key>NSSupportsSuddenTermination</key>
+    <false/>
+    <key>SUFeedURL</key>
+    <string>https://devwizardhq.github.io/VoltGuard/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>4vEslbwT3gsH4pvD7X+yhroFAs+xbn85DUX2iLvbO48=</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>86400</integer>
+</dict>
+</plist>

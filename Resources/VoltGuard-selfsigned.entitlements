@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>com.apple.security.app-sandbox</key>
+    <false/>
+    <key>com.apple.security.automation.apple-events</key>
+    <false/>
+    <!-- Hardened Runtime turns on library validation, which refuses to load a
+         bundled framework unless it shares the app's Team ID. A self-signed
+         identity has no Team ID, so VoltGuard cannot load its own copy of
+         Sparkle without this. Developer ID builds use the strict entitlements
+         file instead and keep library validation on. -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <true/>
+</dict>
+</plist>

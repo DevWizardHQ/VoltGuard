@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in VoltGuard does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please attach a diagnostic report: **Settings → Advanced → Export Diagnostics**.
+        Read it before you paste it — it contains your macOS version, Mac model,
+        VoltGuard configuration, and recent log lines.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Set Low Warning to 20%
+        2. Unplug the charger
+        3. Wait for the battery to reach 20%
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: VoltGuard version
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and Mac model
+      placeholder: macOS 15.1, MacBookPro18,3
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostic report
+      render: text

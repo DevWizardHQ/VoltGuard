@@ -1,0 +1,53 @@
+# ─── Private ──────────────────────────────────────────────────────────────
+# Working notes, release process, credentials and key backups.
+# Ignored wholesale and never un-ignored: this holds the Sparkle signing key
+# and the code-signing .p12, so one stray exception here publishes them.
+docs/
+
+# ─── Swift Package Manager ────────────────────────────────────────────────
+# Package.resolved IS committed: VoltGuard is an application, and pinned
+# dependency versions are what make a release build reproducible.
+.build/
+.build-*/
+.swiftpm/
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+
+# ─── Build output ─────────────────────────────────────────────────────────
+dist/
+build-iconset/
+*.app
+*.dmg
+*.zip
+
+# Written by Scripts/make-dmg-background.swift. Only the combined .tiff is a
+# build input; the per-scale PNGs are intermediates.
+Resources/Assets/dmg-background.png
+Resources/Assets/dmg-background@2x.png
+
+# ─── Signing and notarization material ────────────────────────────────────
+# Belt and braces: these must never be committed from anywhere in the tree.
+*.p12
+*.cer
+*.pem
+*.certSigningRequest
+*.provisionprofile
+AuthKey_*.p8
+*_ed25519_private*
+
+# ─── Tooling scratch ──────────────────────────────────────────────────────
+.playwright-mcp/
+.icontest/
+*.log
+
+# ─── macOS ────────────────────────────────────────────────────────────────
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# ─── Editors ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp

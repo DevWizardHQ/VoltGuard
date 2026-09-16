@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest something VoltGuard should do
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve
+      description: Describe the situation, not the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you have in mind
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This keeps VoltGuard a small utility rather than turning it into a dashboard
+        - label: This does not require a new third-party dependency

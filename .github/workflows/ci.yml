@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode
+        # Swift 6 tools are required for swift-tools-version: 6.0 and the
+        # Swift Testing macros.
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)"
+          swift --version
+
+      - name: Cache SwiftPM
+        uses: actions/cache@v6
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Build
+        run: swift build -c debug
+
+      - name: Test
+        run: swift test
+
+      - name: Lint formatting
+        run: swift format lint --recursive --strict Sources Tests
+
+      - name: Self-test against the runner's real hardware
+        run: make selftest CONFIG=debug
+
+  bundle:
+    name: Assemble app bundle
+    runs-on: macos-15
+    needs: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Select Xcode
+        # Swift 6 tools are required for swift-tools-version: 6.0 and the
+        # Swift Testing macros.
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)"
+          swift --version
+
+      - name: Cache SwiftPM
+        uses: actions/cache@v6
+        with:
+          path: |
+            .build
+            ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Assemble universal bundle
+        run: make bundle VERSION=0.0.0-ci BUILD=${{ github.run_number }}
+
+      - name: Verify the binary is universal
+        run: |
+          ARCHS="$(lipo -archs dist/VoltGuard.app/Contents/MacOS/VoltGuard)"
+          echo "$ARCHS"
+          grep -q arm64 <<<"$ARCHS" && grep -q x86_64 <<<"$ARCHS"
+
+      - name: Verify Sparkle is embedded
+        run: |
+          test -d dist/VoltGuard.app/Contents/Frameworks/Sparkle.framework
+          otool -l dist/VoltGuard.app/Contents/MacOS/VoltGuard | grep -q '@executable_path/../Frameworks'
+
+      - name: Launch the app and confirm it stays running
+        # The default `bash -e` aborts on the crashed child before the
+        # diagnostics below can print.
+        shell: bash --noprofile --norc {0}
+        run: |
+          set -uo pipefail
+          # Sign through the real script, not `--deep --sign -`: ad-hoc has no
+          # hardened runtime, so it silently hides library-validation failures.
+          ./Scripts/sign.sh dist/VoltGuard.app
+
+          dist/VoltGuard.app/Contents/MacOS/VoltGuard > app.out 2> app.err &
+          APP_PID=$!
+          sleep 12
+          if kill -0 "$APP_PID" 2>/dev/null; then
+            echo "VoltGuard is still running after 12s (pid $APP_PID)"
+            kill "$APP_PID" 2>/dev/null || true
+            echo "--- app log ---"
+            cat "$HOME/Library/Logs/VoltGuard/voltguard.log" 2>/dev/null || echo "(none)"
+            exit 0
+          fi
+
+          wait "$APP_PID" 2>/dev/null; CODE=$?
+          echo "VoltGuard exited early with code $CODE"
+          echo "--- stdout ---"; cat app.out
+          echo "--- stderr ---"; cat app.err
+          echo "--- app log ---"
+          cat "$HOME/Library/Logs/VoltGuard/voltguard.log" 2>/dev/null || echo "(none)"
+
+          echo "--- backtrace under lldb ---"
+          lldb -b \
+            -o 'run' \
+            -o 'thread backtrace all' \
+            -o 'quit' \
+            -- dist/VoltGuard.app/Contents/MacOS/VoltGuard 2>&1 | tail -80
+
+          echo "--- linked libraries ---"
+          otool -L dist/VoltGuard.app/Contents/MacOS/VoltGuard | head -20
+          echo "--- bundle layout ---"
+          find dist/VoltGuard.app -maxdepth 4 -name '*.framework' -o -maxdepth 4 -name 'Info.plist' | head
+
+          echo "--- crash reports ---"
+          for f in "$HOME"/Library/Logs/DiagnosticReports/VoltGuard*; do
+            [ -e "$f" ] || continue
+            echo "== $f"; head -80 "$f"
+          done
+          exit 1
