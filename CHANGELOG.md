@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The signed appcast never reached the published site. The release workflow
+  commits it with `GITHUB_TOKEN`, and GitHub raises no push event for commits
+  made with that token, so the Pages workflow never ran and the live feed kept
+  serving the previous build. Pages now also deploys on the release workflow
+  completing.
+- The notification permission prompt appeared on first launch even when no
+  enabled rule used the notification channel. It is now raised only when a
+  rule can actually post one, and when a rule later starts using it.
+
+### Changed
+
+- Documentation said Xcode 15.4 was enough to build. The package declares
+  swift-tools-version 6.0, so it needs Xcode 16.
+
 ## [0.1.0] - 2026-09-16
 
 First release. Signed with the DevWizardHQ stable identity and **not

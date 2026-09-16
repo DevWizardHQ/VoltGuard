@@ -97,7 +97,8 @@ open dist/VoltGuard.app
 ## Requirements
 
 - macOS 14.0 Sonoma or later
-- Xcode 15.4 or later to build (the Command Line Tools alone are not enough —
+- Xcode 16 or later to build: `Package.swift` declares swift-tools-version
+  6.0, and the Command Line Tools alone are not enough —
   SwiftUI's `@State` macro plugin ships inside Xcode)
 
 ## Development

@@ -12,7 +12,8 @@ make test
 make run
 ```
 
-You need macOS 14+ and Xcode 15.4+. The Command Line Tools alone cannot build
+You need macOS 14+ and Xcode 16+, because the package declares
+swift-tools-version 6.0. The Command Line Tools alone cannot build
 `VoltGuardUI`, because SwiftUI's `@State` macro plugin ships inside Xcode. Use
 `make test-core` to run the non-UI tests without Xcode.
 

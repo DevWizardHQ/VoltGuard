@@ -74,10 +74,8 @@ public final class AppState {
         FileLogSink.shared.isDebugEnabled = settings.debugLogging
         syncLoginItem()
 
-        Task { [weak self] in
-            guard let self else { return }
-            let granted = await notifications.requestAuthorization()
-            self.notificationsAuthorized = granted
+        if settings.usesNotifications {
+            requestNotificationAuthorization()
         }
 
         Task { [weak self] in
@@ -228,6 +226,9 @@ public final class AppState {
         if settings.retention != previous.retention {
             Task { await pruneHistory() }
         }
+        if settings.usesNotifications, !previous.usesNotifications {
+            requestNotificationAuthorization()
+        }
 
         let engineConfiguration = settings.engineConfiguration
         let dispatcherConfiguration = DispatcherConfiguration(sound: settings.sound, voice: settings.voice)
@@ -247,6 +248,13 @@ public final class AppState {
 
     /// The user can disable the login item in System Settings, so the stored
     /// preference is reconciled against what SMAppService actually reports.
+    private func requestNotificationAuthorization() {
+        Task { [weak self] in
+            guard let self else { return }
+            self.notificationsAuthorized = await notifications.requestAuthorization()
+        }
+    }
+
     private func syncLoginItem() {
         guard Bundle.main.bundleIdentifier != nil else { return }
         LoginItemManager.setEnabled(settings.launchAtLogin)

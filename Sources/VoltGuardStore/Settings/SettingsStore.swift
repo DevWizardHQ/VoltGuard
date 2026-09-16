@@ -34,6 +34,12 @@ public struct AppSettings: Codable, Equatable, Sendable {
         hasCompletedOnboarding: false
     )
 
+    /// True when any enabled rule can actually post a notification, so the
+    /// permission prompt is only raised for someone who will see one.
+    public var usesNotifications: Bool {
+        rules.contains { $0.isEnabled && $0.channels.contains(.notification) }
+    }
+
     public var engineConfiguration: EngineConfiguration {
         EngineConfiguration(monitoring: monitoring, rules: rules, schedule: schedule)
     }

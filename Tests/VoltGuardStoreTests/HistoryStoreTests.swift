@@ -294,3 +294,32 @@ struct ExportRangeBoundsTests {
         #expect(lines.count == 2)
     }
 }
+
+@Suite("Notification permission gating")
+struct NotificationGatingTests {
+    @Test("the shipped defaults do use notifications")
+    func defaultsUseNotifications() {
+        #expect(AppSettings.defaults.usesNotifications)
+    }
+
+    @Test("a rule set with no notification channel does not")
+    func noNotificationChannel() {
+        var settings = AppSettings.defaults
+        for index in settings.rules.indices {
+            settings.rules[index].channels.remove(.notification)
+        }
+        #expect(!settings.usesNotifications)
+    }
+
+    @Test("a disabled notification rule does not count")
+    func disabledRuleDoesNotCount() {
+        var settings = AppSettings.defaults
+        for index in settings.rules.indices {
+            settings.rules[index].isEnabled =
+                settings.rules[index].channels.contains(.notification)
+                ? false
+                : settings.rules[index].isEnabled
+        }
+        #expect(!settings.usesNotifications)
+    }
+}
