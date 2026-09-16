@@ -9,13 +9,8 @@ struct HistoryChartView: View {
     @State private var isLoading = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Picker("Range", selection: $range) {
-                ForEach(HistoryRange.allCases) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .accessibilityLabel("History range")
+        VStack(spacing: 0) {
+            RangeHeader(range: $range, label: "History range")
 
             if isLoading {
                 ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -24,12 +19,14 @@ struct HistoryChartView: View {
                     "No history yet",
                     systemImage: "chart.xyaxis.line",
                     description: Text(
-                        "VoltGuard records a sample whenever the battery level or power source changes.")
+                        "VoltGuard records a sample whenever the battery level or power source changes."
+                    )
                 )
+                .frame(maxHeight: .infinity)
             } else {
                 Chart(points, id: \.date) { point in
                     AreaMark(x: .value("Time", point.date), y: .value("Battery", point.value))
-                        .foregroundStyle(.tint.opacity(0.18))
+                        .foregroundStyle(.tint.opacity(0.16))
                     LineMark(x: .value("Time", point.date), y: .value("Battery", point.value))
                         .foregroundStyle(.tint)
                         .interpolationMethod(.monotone)
@@ -37,9 +34,10 @@ struct HistoryChartView: View {
                 .chartYScale(domain: 0...100)
                 .chartYAxisLabel("Battery %")
                 .accessibilityLabel("Battery level over the last \(range.title)")
+                .padding(16)
             }
         }
-        .padding()
+        .historyTabLayout()
         .task(id: range) { await load() }
     }
 

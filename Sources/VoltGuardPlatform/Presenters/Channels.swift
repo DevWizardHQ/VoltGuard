@@ -1,7 +1,22 @@
 import Foundation
 import VoltGuardCore
 
+public enum NotificationAuthorization: Sendable, Equatable {
+    /// macOS has never asked; requesting will show the prompt.
+    case notDetermined
+    /// The user said no. Requesting again does nothing — only System Settings
+    /// can undo it.
+    case denied
+    case authorized
+    case provisional
+    /// No notification centre: an unbundled or unregistered copy.
+    case unavailable
+
+    public var canDeliver: Bool { self == .authorized || self == .provisional }
+}
+
 public protocol NotificationPresenting: Sendable {
+    func authorizationStatus() async -> NotificationAuthorization
     func requestAuthorization() async -> Bool
     func present(_ event: AlertEvent, soundName: String?) async -> ChannelOutcome
 }

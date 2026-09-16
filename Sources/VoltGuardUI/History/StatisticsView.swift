@@ -9,36 +9,35 @@ struct StatisticsView: View {
     @State private var daily: [DailyAggregate] = []
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Picker("Range", selection: $range) {
-                    ForEach(HistoryRange.allCases) { Text($0.title).tag($0) }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+        VStack(spacing: 0) {
+            RangeHeader(range: $range, label: "Statistics range")
 
-                currentSection
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    currentSection
 
-                if let statistics {
-                    summarySection(statistics)
-                }
-
-                if !daily.isEmpty {
-                    Text("Daily average").font(.headline)
-                    Chart(daily) { aggregate in
-                        BarMark(
-                            x: .value("Day", aggregate.day, unit: .day),
-                            y: .value("Average", aggregate.average)
-                        )
-                        .foregroundStyle(.tint)
+                    if let statistics {
+                        summarySection(statistics)
                     }
-                    .chartYScale(domain: 0...100)
-                    .frame(height: 180)
-                    .accessibilityLabel("Daily average battery level")
+
+                    if !daily.isEmpty {
+                        Text("Daily average").font(.headline)
+                        Chart(daily) { aggregate in
+                            BarMark(
+                                x: .value("Day", aggregate.day, unit: .day),
+                                y: .value("Average", aggregate.average)
+                            )
+                            .foregroundStyle(.tint)
+                        }
+                        .chartYScale(domain: 0...100)
+                        .frame(height: 180)
+                        .accessibilityLabel("Daily average battery level")
+                    }
                 }
+                .padding(16)
             }
-            .padding()
         }
+        .historyTabLayout()
         .task(id: range) { await load() }
     }
 

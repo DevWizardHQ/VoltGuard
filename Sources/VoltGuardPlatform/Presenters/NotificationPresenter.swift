@@ -11,12 +11,29 @@ public final class NotificationPresenter: NotificationPresenting, @unchecked Sen
         center = Bundle.main.bundleIdentifier == nil ? nil : .current()
     }
 
+    public func authorizationStatus() async -> NotificationAuthorization {
+        guard let center else { return .unavailable }
+        switch await center.notificationSettings().authorizationStatus {
+        case .notDetermined: return .notDetermined
+        case .denied: return .denied
+        case .authorized: return .authorized
+        case .provisional: return .provisional
+        @unknown default: return .unavailable
+        }
+    }
+
     public func requestAuthorization() async -> Bool {
         guard let center else { return false }
         do {
             return try await center.requestAuthorization(options: [.alert, .sound, .badge])
         } catch {
-            Log.warning(.alerts, "Notification authorization failed: \(error.localizedDescription)")
+            // The usual cause is a copy that macOS does not treat as an
+            // installed app: run from a disk image, from Downloads under App
+            // Translocation, or never registered with Launch Services.
+            Log.warning(
+                .alerts,
+                "Notification authorization failed: \(error.localizedDescription) — running from \(Bundle.main.bundlePath)"
+            )
             return false
         }
     }

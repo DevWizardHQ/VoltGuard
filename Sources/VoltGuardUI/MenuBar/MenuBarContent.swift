@@ -17,10 +17,8 @@ public struct MenuBarContent: View {
                 Button(state.settings.monitoring.isEnabled ? "Pause Monitoring" : "Resume Monitoring") {
                     state.togglePause()
                 }
-                .keyboardShortcut("p")
 
                 Button("Check Now") { state.checkNow() }
-                    .keyboardShortcut("r")
 
                 Button(state.settings.monitoring.alertsGloballyEnabled ? "Disable Alerts" : "Enable Alerts") {
                     state.toggleAlerts()
@@ -28,23 +26,21 @@ public struct MenuBarContent: View {
                 Divider()
             }
 
-            if !state.notificationsAuthorized {
-                Button("Notifications Are Disabled…") { state.openNotificationSettings() }
+            // Only worth showing when the user can actually fix it: an
+            // unbundled copy has no notification centre to enable.
+            if state.notificationAuthorization == .denied {
+                Button("Notifications Are Turned Off…") { state.openNotificationSettings() }
                 Divider()
             }
 
             Button("Battery History") { open(tab: .history) }
-                .keyboardShortcut("y")
             Button("Statistics") { open(tab: .statistics) }
-                .keyboardShortcut("t")
             Divider()
 
             Button("Settings…") { openSettings() }
-                .keyboardShortcut(",")
             Divider()
 
             Button("Quit VoltGuard") { NSApplication.shared.terminate(nil) }
-                .keyboardShortcut("q")
         }
     }
 

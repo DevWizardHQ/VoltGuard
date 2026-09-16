@@ -7,13 +7,8 @@ struct AlertLogView: View {
     @State private var range: HistoryRange = .month
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Picker("Range", selection: $range) {
-                ForEach(HistoryRange.allCases) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .accessibilityLabel("Alert history range")
+        VStack(spacing: 0) {
+            RangeHeader(range: $range, label: "Alert history range")
 
             if entries.isEmpty {
                 ContentUnavailableView(
@@ -21,6 +16,7 @@ struct AlertLogView: View {
                     systemImage: "bell.slash",
                     description: Text("Alerts appear here once a rule fires.")
                 )
+                .frame(maxHeight: .infinity)
             } else {
                 Table(entries) {
                     TableColumn("When") { entry in
@@ -38,9 +34,10 @@ struct AlertLogView: View {
                             .accessibilityLabel(entry.wasDelivered ? "Delivered" : "Not delivered")
                     }
                 }
+                .tableStyle(.inset)
             }
         }
-        .padding()
+        .historyTabLayout()
         .task(id: range) { await load() }
     }
 

@@ -1,5 +1,6 @@
 import SwiftUI
 import VoltGuardCore
+import VoltGuardPlatform
 
 struct GeneralTab: View {
     @Environment(AppState.self) private var state
@@ -22,6 +23,24 @@ struct GeneralTab: View {
                     .foregroundStyle(.secondary)
             }
 
+            Section("Notifications") {
+                LabeledContent("Permission", value: permissionDescription)
+                if state.notificationAuthorization == .denied {
+                    Button("Open Notification Settings…") { state.openNotificationSettings() }
+                    Text(
+                        "macOS only asks once. Once notifications are turned off, they can only be turned back on in System Settings."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                } else if state.notificationAuthorization == .unavailable {
+                    Text(
+                        "No notification centre is available. This happens when VoltGuard is run from the disk image or from Downloads; move it to Applications and open it from there."
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+            }
+
             Section("Startup") {
                 Toggle("Launch VoltGuard at login", isOn: $state.settings.launchAtLogin)
             }
@@ -35,5 +54,15 @@ struct GeneralTab: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    private var permissionDescription: String {
+        switch state.notificationAuthorization {
+        case .authorized: "Allowed"
+        case .provisional: "Delivered quietly"
+        case .denied: "Turned off"
+        case .notDetermined: "Not yet requested"
+        case .unavailable: "Unavailable"
+        }
     }
 }

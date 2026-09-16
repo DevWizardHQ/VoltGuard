@@ -11,7 +11,7 @@ import VoltGuardStore
 public final class AppState {
     public private(set) var status: MonitoringStatus
     public private(set) var voices: [SystemVoice] = []
-    public private(set) var notificationsAuthorized = true
+    public private(set) var notificationAuthorization: NotificationAuthorization = .authorized
     public private(set) var ruleWarnings: [RuleWarning] = []
     public private(set) var historyIsAvailable = true
 
@@ -74,8 +74,17 @@ public final class AppState {
         FileLogSink.shared.isDebugEnabled = settings.debugLogging
         syncLoginItem()
 
-        if settings.usesNotifications {
-            requestNotificationAuthorization()
+        refreshNotificationAuthorization(requestIfUnasked: true)
+
+        // The user can grant or revoke notifications in System Settings while
+        // VoltGuard is running; without this the menu keeps reporting whatever
+        // was true at launch.
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.refreshNotificationAuthorization() }
         }
 
         Task { [weak self] in
@@ -227,7 +236,7 @@ public final class AppState {
             Task { await pruneHistory() }
         }
         if settings.usesNotifications, !previous.usesNotifications {
-            requestNotificationAuthorization()
+            refreshNotificationAuthorization(requestIfUnasked: true)
         }
 
         let engineConfiguration = settings.engineConfiguration
@@ -248,10 +257,18 @@ public final class AppState {
 
     /// The user can disable the login item in System Settings, so the stored
     /// preference is reconciled against what SMAppService actually reports.
-    private func requestNotificationAuthorization() {
+    private func refreshNotificationAuthorization(requestIfUnasked: Bool = false) {
         Task { [weak self] in
             guard let self else { return }
-            self.notificationsAuthorized = await notifications.requestAuthorization()
+            var status = await notifications.authorizationStatus()
+            if requestIfUnasked, status == .notDetermined, settings.usesNotifications {
+                _ = await notifications.requestAuthorization()
+                status = await notifications.authorizationStatus()
+            }
+            self.notificationAuthorization = status
+            if status == .denied {
+                Log.warning(.alerts, "Notifications are denied for VoltGuard in System Settings")
+            }
         }
     }
 

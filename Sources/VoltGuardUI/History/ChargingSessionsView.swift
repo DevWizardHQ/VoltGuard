@@ -4,15 +4,19 @@ import VoltGuardCore
 struct ChargingSessionsView: View {
     @Environment(AppState.self) private var state
     @State private var sessions: [ChargingSession] = []
+    @State private var range: HistoryRange = .month
 
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
+            RangeHeader(range: $range, label: "Charging session range")
+
             if sessions.isEmpty {
                 ContentUnavailableView(
                     "No charging sessions yet",
                     systemImage: "bolt.badge.clock",
                     description: Text("A session is recorded each time the charger is connected.")
                 )
+                .frame(maxHeight: .infinity)
             } else {
                 Table(sessions) {
                     TableColumn("Started") { session in
@@ -30,9 +34,11 @@ struct ChargingSessionsView: View {
                         Text(session.duration.map(format) ?? "—")
                     }
                 }
+                .tableStyle(.inset)
             }
         }
-        .task { await load() }
+        .historyTabLayout()
+        .task(id: range) { await load() }
     }
 
     private func format(_ duration: TimeInterval) -> String {
@@ -43,7 +49,7 @@ struct ChargingSessionsView: View {
 
     private func load() async {
         guard let store = state.history else { return }
-        let interval = HistoryRange.month.interval()
+        let interval = range.interval()
         sessions = (try? await store.sessions(from: interval.start, to: interval.end)) ?? []
     }
 }

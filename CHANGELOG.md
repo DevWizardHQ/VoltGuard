@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The Settings ▸ Alerts tab was broken: `HSplitView` collapsed the rule list
+  to its intrinsic height inside a fixed-size window, so it floated in the
+  middle of the tab with rows clipped. It is now a proper sidebar that fills
+  the window.
+- The history window's tabs left a band of empty space above their controls,
+  because a `VStack` centres itself when given extra height. Content is pinned
+  to the top, the range picker sits in a header strip at its natural width
+  rather than stretched edge to edge, and Charging Sessions gained the same
+  range control as the other tabs.
+- The menu reported "Notifications Are Disabled" forever: the permission was
+  read once at launch, so turning notifications on in System Settings had no
+  effect until VoltGuard was restarted. It is now re-read whenever the app
+  becomes active, and it distinguishes "not yet asked" from "turned off" from
+  "no notification centre available", which is what happens when the app is
+  run from the disk image instead of Applications.
+
 - The signed appcast never reached the published site. The release workflow
   commits it with `GITHUB_TOKEN`, and GitHub raises no push event for commits
   made with that token, so the Pages workflow never ran and the live feed kept
@@ -19,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rule can actually post one, and when a rule later starts using it.
 
 ### Changed
+
+- Removed the keyboard shortcuts from the menu bar. VoltGuard is an accessory
+  app and is never the frontmost application, so they never fired; showing
+  them promised something that did not work.
 
 - Documentation said Xcode 15.4 was enough to build. The package declares
   swift-tools-version 6.0, so it needs Xcode 16.
