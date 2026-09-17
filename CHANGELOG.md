@@ -5,6 +5,26 @@ All notable changes to VoltGuard are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- The application icon is white on the dark plate rather than blue and green.
+- The installer background follows the icon's plate instead of ending in a
+  bright blue, which was the last coloured surface left.
+
+### Fixed
+
+- The charging bolt in the application icon was cut by white slivers. The
+  knockout was the bolt path and its own outline appended under the even-odd
+  rule, so wherever the two overlapped the fill came back. They are unioned
+  into one shape, and the mark is drawn in a transparency layer so punching
+  the bolt clears the mark without cutting a hole through the plate.
+
+### Removed
+
+- `Resources/Assets/battery-charging.svg`, the icon the shield mark replaced.
+
 ## [0.1.6] - 2026-09-17
 
 ### Fixed
@@ -159,7 +179,8 @@ System Settings ▸ Privacy & Security ▸ Open Anyway.
   before anything can be published.
 - A documentation site published to GitHub Pages alongside the appcast.
 
-[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.7...HEAD
+[0.1.7]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.7
 [0.1.6]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.6
 [0.1.2]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.2
 [0.1.1]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.1

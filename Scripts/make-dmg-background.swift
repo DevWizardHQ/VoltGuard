@@ -31,10 +31,21 @@ func render(scale: CGFloat) -> Data? {
     func y(_ fromTop: CGFloat) -> CGFloat { height - fromTop }
 
     NSGradient(colors: [
-        NSColor(calibratedRed: 0.035, green: 0.055, blue: 0.082, alpha: 1),
-        NSColor(calibratedRed: 0.078, green: 0.114, blue: 0.165, alpha: 1),
-        NSColor(calibratedRed: 0.118, green: 0.275, blue: 0.545, alpha: 1),
+        NSColor(calibratedRed: 0.086, green: 0.125, blue: 0.180, alpha: 1),
+        NSColor(calibratedRed: 0.055, green: 0.082, blue: 0.122, alpha: 1),
+        NSColor(calibratedRed: 0.027, green: 0.043, blue: 0.067, alpha: 1),
     ])?.draw(in: NSRect(x: 0, y: 0, width: width, height: height), angle: 270)
+
+    NSGradient(
+        starting: NSColor(calibratedWhite: 1, alpha: 0.07),
+        ending: NSColor(calibratedWhite: 1, alpha: 0)
+    )?.draw(
+        fromCenter: NSPoint(x: width / 2, y: height * 0.62),
+        radius: 0,
+        toCenter: NSPoint(x: width / 2, y: height * 0.62),
+        radius: width * 0.55,
+        options: []
+    )
 
     func draw(_ text: String, size: CGFloat, weight: NSFont.Weight, alpha: CGFloat, topY: CGFloat) {
         let style = NSMutableParagraphStyle()

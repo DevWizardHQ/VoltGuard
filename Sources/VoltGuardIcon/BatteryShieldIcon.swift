@@ -55,6 +55,7 @@ public struct BatteryShieldIcon: Sendable {
         static let slimBodyStroke: CGFloat = 30
 
         static let slimBolt = "M604 268 L392 570 H506 L442 766 L648 452 H534 Z"
+        static let boltInflation: CGFloat = 34
     }
 
     private enum Palette {
@@ -94,6 +95,7 @@ public struct BatteryShieldIcon: Sendable {
         let slim = !includePlate
         guard let context = NSGraphicsContext.current else { return }
         context.saveGraphicsState()
+        defer { context.restoreGraphicsState() }
         context.imageInterpolation = .high
 
         let source =
@@ -122,6 +124,9 @@ public struct BatteryShieldIcon: Sendable {
         }
 
         let ink = monochrome ? NSGradient(colors: [inkColor, inkColor]) : Palette.blue
+
+        context.cgContext.beginTransparencyLayer(auxiliaryInfo: nil)
+        defer { context.cgContext.endTransparencyLayer() }
 
         if guardActive {
             if slim {
@@ -159,6 +164,17 @@ public struct BatteryShieldIcon: Sendable {
         fill(NSBezierPath(cgPath: outline), with: ink, from: blueStart, to: blueEnd)
 
         let bolt = SVGPath.path(slim ? Art.slimBolt : Art.bolt)
+        let knockout = NSBezierPath(
+            cgPath: bolt.cgPath.union(
+                bolt.cgPath.copy(
+                    strokingWithWidth: Art.boltInflation,
+                    lineCap: .round,
+                    lineJoin: .round,
+                    miterLimit: 10
+                ),
+                using: .winding
+            )
+        )
         let fraction = min(max(level ?? 0, 0), 100) / 100
         let chargeHeight = Art.window.height * fraction
         let charge = NSRect(
@@ -180,20 +196,7 @@ public struct BatteryShieldIcon: Sendable {
                 yRadius: Art.windowRadius
             ).addClip()
 
-            let region = NSBezierPath(rect: charge)
-            if isCharging {
-                region.append(
-                    NSBezierPath(
-                        cgPath: bolt.cgPath.copy(
-                            strokingWithWidth: 34,
-                            lineCap: .round,
-                            lineJoin: .round,
-                            miterLimit: 10
-                        )))
-                region.append(bolt)
-            }
-            region.windingRule = .evenOdd
-            region.addClip()
+            NSBezierPath(rect: charge).addClip()
 
             gradient.draw(
                 from: NSPoint(x: Art.window.minX, y: Art.window.minY),
@@ -222,7 +225,7 @@ public struct BatteryShieldIcon: Sendable {
                     )
                 ).addClip()
                 fill(
-                    bolt,
+                    knockout,
                     with: monochrome ? NSGradient(colors: [inkColor, inkColor]) : Palette.bolt,
                     from: NSPoint(x: Art.window.minX, y: Art.window.minY),
                     to: NSPoint(x: Art.window.maxX, y: Art.window.maxY)
@@ -235,12 +238,10 @@ public struct BatteryShieldIcon: Sendable {
                 NSBezierPath(rect: charge).addClip()
                 NSGraphicsContext.current?.compositingOperation = .destinationOut
                 NSColor.black.setFill()
-                bolt.fill()
+                knockout.fill()
                 NSGraphicsContext.restoreGraphicsState()
             }
         }
-
-        context.restoreGraphicsState()
     }
 
     private var blueStart: NSPoint { NSPoint(x: 0, y: 120) }

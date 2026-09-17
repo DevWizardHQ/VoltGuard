@@ -93,13 +93,13 @@ let iconset = root.appendingPathComponent("build-iconset/AppIcon.iconset")
 try? FileManager.default.removeItem(at: iconset)
 try FileManager.default.createDirectory(at: iconset, withIntermediateDirectories: true)
 
-// The app icon shows a healthy, charging, guarded battery.
 let mark = BatteryShieldIcon(level: 100, isCharging: true, guardActive: true)
 
 for size in sizes {
-    guard let data = mark.png(pixels: size, includePlate: true) else { continue }
+    guard let data = mark.png(pixels: size, includePlate: true, monochrome: true, ink: .white)
+    else { continue }
     try data.write(to: iconset.appendingPathComponent("icon_\(size)x\(size).png"))
-    if let retina = mark.png(pixels: size * 2, includePlate: true) {
+    if let retina = mark.png(pixels: size * 2, includePlate: true, monochrome: true, ink: .white) {
         try retina.write(to: iconset.appendingPathComponent("icon_\(size)x\(size)@2x.png"))
     }
 }
