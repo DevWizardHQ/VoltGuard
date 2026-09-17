@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The charging bolt was invisible in the menu bar. It was painted in the same
+  ink as the charge fill and separated only by a hairline gap, which vanished
+  at menu bar size. Where the fill covers it the bolt is now a hole punched
+  clean through; where the level is too low for the fill to reach it, the
+  bolt is painted instead.
+
 ### Changed
 
 - The menu bar icon is a monochrome template image, like every other item in

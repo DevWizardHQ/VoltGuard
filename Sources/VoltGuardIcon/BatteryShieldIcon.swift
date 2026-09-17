@@ -151,17 +151,36 @@ public struct BatteryShieldIcon: Sendable {
         fill(NSBezierPath(cgPath: outline), with: ink, from: blueStart, to: blueEnd)
 
         let bolt = SVGPath.path(Art.bolt)
+        let fraction = min(max(level ?? 0, 0), 100) / 100
+        let chargeHeight = Art.window.height * fraction
+        // The artwork's y axis runs downward, so the charge sits at the bottom.
+        let charge = NSRect(
+            x: Art.window.minX,
+            y: Art.window.maxY - chargeHeight,
+            width: Art.window.width,
+            height: chargeHeight
+        )
 
-        // Drawn beneath the charge, then knocked back out of it. Without the
-        // underlying shape the bolt vanished whenever the level was too low
-        // for the fill to reach it — a charger attached at 20% showed nothing.
-        if isCharging {
+        // Above the charge the bolt is painted; within it the bolt is a hole
+        // punched clean through. Painting it in the same ink as the fill and
+        // relying on a hairline gap made it vanish at menu bar size.
+        if isCharging, charge.minY > Art.window.minY {
+            NSGraphicsContext.saveGraphicsState()
+            NSBezierPath(
+                rect: NSRect(
+                    x: Art.window.minX,
+                    y: Art.window.minY,
+                    width: Art.window.width,
+                    height: charge.minY - Art.window.minY
+                )
+            ).addClip()
             fill(
                 bolt,
                 with: monochrome ? NSGradient(colors: [.black, .black]) : Palette.bolt,
                 from: NSPoint(x: 411, y: 277),
                 to: NSPoint(x: 641, y: 723)
             )
+            NSGraphicsContext.restoreGraphicsState()
         }
 
         if let level, level > 0,
@@ -169,15 +188,6 @@ public struct BatteryShieldIcon: Sendable {
                 ? NSGradient(colors: [.black, .black])
                 : Palette.fill(level: level)
         {
-            let fraction = min(max(level, 0), 100) / 100
-            let height = Art.window.height * fraction
-            let charge = NSRect(
-                x: Art.window.minX,
-                y: Art.window.maxY - height,
-                width: Art.window.width,
-                height: height
-            )
-
             NSGraphicsContext.saveGraphicsState()
             NSBezierPath(
                 roundedRect: Art.window,
@@ -187,11 +197,11 @@ public struct BatteryShieldIcon: Sendable {
 
             let region = NSBezierPath(rect: charge)
             if isCharging {
-                // A halo keeps the bolt legible where the fill surrounds it.
+                // Slightly inflated so the hole survives being scaled to 18pt.
                 region.append(
                     NSBezierPath(
                         cgPath: bolt.cgPath.copy(
-                            strokingWithWidth: 44,
+                            strokingWithWidth: 22,
                             lineCap: .round,
                             lineJoin: .round,
                             miterLimit: 10
