@@ -2,14 +2,9 @@ import AppKit
 import VoltGuardCore
 
 public final class DialogPresenter: DialogPresenting, @unchecked Sendable {
-    public typealias OpenSettings = @MainActor () -> Void
-
-    private let openSettings: OpenSettings
     private let isPresenting = OSAllocatedLock()
 
-    public init(openSettings: @escaping OpenSettings) {
-        self.openSettings = openSettings
-    }
+    public init() {}
 
     public func present(_ event: AlertEvent) async -> ChannelOutcome {
         // Only one dialog at a time; a second event loses the dialog channel
@@ -18,17 +13,12 @@ public final class DialogPresenter: DialogPresenting, @unchecked Sendable {
             return .suppressed(.dialogAlreadyPresented)
         }
 
-        let outcome = await MainActor.run { [openSettings] () -> ChannelOutcome in
+        let outcome = await MainActor.run { () -> ChannelOutcome in
             let alert = NSAlert()
             alert.messageText = event.title
             alert.informativeText = event.body
             alert.alertStyle = event.rule.direction == .low ? .critical : .informational
-            // A non-dismissible rule drops the Dismiss button so the only way
-            // out is the action; the alert still closes, it is not a trap.
-            if event.rule.dialogIsDismissible {
-                alert.addButton(withTitle: "Dismiss")
-            }
-            alert.addButton(withTitle: "Open Settings")
+            alert.addButton(withTitle: "Dismiss")
 
             NSApplication.shared.activate(ignoringOtherApps: true)
             NSAccessibility.post(
@@ -40,10 +30,7 @@ public final class DialogPresenter: DialogPresenting, @unchecked Sendable {
                 ]
             )
 
-            let response = alert.runModal()
-            let settingsButton: NSApplication.ModalResponse =
-                event.rule.dialogIsDismissible ? .alertSecondButtonReturn : .alertFirstButtonReturn
-            if response == settingsButton { openSettings() }
+            alert.runModal()
             return .delivered
         }
 

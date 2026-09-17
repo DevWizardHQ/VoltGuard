@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   into one shape, and the mark is drawn in a transparency layer so punching
   the bolt clears the mark without cutting a hole through the plate.
 
+- The alert dialog offers only Dismiss. Open Settings sat beside it on every
+  alert and pulled the user out of what they were doing to reach a window the
+  menu bar already opens, so it is gone, along with the per-rule "Dialog can
+  be dismissed" toggle that existed only to hide Dismiss behind it.
+- `site/mark.svg` and `Resources/Assets/battery-shield-icon.svg` carry the
+  white mark, so the site logo, the favicon and the artwork match the icns.
+
 ### Removed
 
 - `Resources/Assets/battery-charging.svg`, the icon the shield mark replaced.

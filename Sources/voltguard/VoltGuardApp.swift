@@ -79,10 +79,7 @@ enum Composition {
         let notifications = NotificationPresenter()
         let sounds = SoundPlayer()
         let speech = SpeechPresenter()
-        let dialogs = DialogPresenter {
-            NSApplication.shared.activate(ignoringOtherApps: true)
-            NSApplication.shared.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        }
+        let dialogs = DialogPresenter()
 
         let dispatcher = AlertDispatcher(
             notifications: notifications,

@@ -113,7 +113,6 @@ public struct AlertRule: Identifiable, Codable, Equatable, Sendable {
     public var repetition: RepetitionPolicy
     public var releaseMarginPercent: Int
     public var extraConditions: [RuleCondition]
-    public var dialogIsDismissible: Bool
 
     public init(
         id: UUID = UUID(),
@@ -127,8 +126,7 @@ public struct AlertRule: Identifiable, Codable, Equatable, Sendable {
         soundName: String? = nil,
         repetition: RepetitionPolicy = .interval(600),
         releaseMarginPercent: Int = 3,
-        extraConditions: [RuleCondition] = [],
-        dialogIsDismissible: Bool = true
+        extraConditions: [RuleCondition] = []
     ) {
         self.id = id
         self.name = name
@@ -142,7 +140,6 @@ public struct AlertRule: Identifiable, Codable, Equatable, Sendable {
         self.repetition = repetition
         self.releaseMarginPercent = max(releaseMarginPercent, 0)
         self.extraConditions = extraConditions
-        self.dialogIsDismissible = dialogIsDismissible
     }
 
     /// Conditions derived from the simple fields, ANDed with `extraConditions`.

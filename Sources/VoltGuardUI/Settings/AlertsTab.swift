@@ -137,9 +137,6 @@ private struct RuleEditor: View {
                             }
                         ))
                 }
-                if rule.channels.contains(.dialog) {
-                    Toggle("Dialog can be dismissed", isOn: $rule.dialogIsDismissible)
-                }
             }
 
             Section("Repetition") {
