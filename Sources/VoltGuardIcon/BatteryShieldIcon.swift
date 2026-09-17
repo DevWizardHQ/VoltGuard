@@ -27,9 +27,10 @@ public struct BatteryShieldIcon: Sendable {
         static let canvas: CGFloat = 1024
         static let plateRadius: CGFloat = 236
 
-        /// Every element's union, so the mark keeps one size whether or not
-        /// the shield is drawn.
-        static let content = NSRect(x: 96, y: 108, width: 832, height: 840)
+        /// Every element's union, including half the shield's stroke, so the
+        /// mark keeps one size whether or not the shield is drawn and nothing
+        /// is clipped at the edges.
+        static let content = NSRect(x: 86, y: 110, width: 852, height: 864)
 
         static let cap = NSRect(x: 413, y: 120, width: 198, height: 100)
         static let capRadius: CGFloat = 34
@@ -57,6 +58,23 @@ public struct BatteryShieldIcon: Sendable {
             """
 
         static let bolt = "M487 533 L525 419 H411 L538 277 L500 391 H614 Z"
+
+        /// The shield's outer contour on its own, stroked rather than filled.
+        /// The artwork fills a thick arm shape, which reads as a heavy slab
+        /// beside Apple's hairline battery in the menu bar.
+        static let shieldOutline = """
+            M282 236 L132 302 C124 330 119 390 124 440 C128 520 158 600 206 678 \
+            C232 720 275 775 324 822 C370 860 440 900 512 934 \
+            C584 900 654 860 700 822 C749 775 792 720 818 678 \
+            C866 600 896 520 900 440 C905 390 900 330 892 302 L742 236
+            """
+        static let shieldStroke: CGFloat = 46
+        static let slimBodyStroke: CGFloat = 30
+
+        /// The artwork's bolt has notched corners that turn to mush at menu
+        /// bar size. This one is bigger and plainer, closer to the bolt in
+        /// Apple's own battery glyph.
+        static let slimBolt = "M556 318 L424 556 H508 L470 716 L600 470 H516 Z"
     }
 
     private enum Palette {
@@ -96,6 +114,9 @@ public struct BatteryShieldIcon: Sendable {
     ///     image, which macOS tints to match the menu bar. Level is still
     ///     legible from the fill height.
     public func draw(in size: CGSize, includePlate: Bool, monochrome: Bool = false) {
+        // The menu bar sits next to Apple's own hairline battery, so the mark
+        // is drawn with lighter strokes there than on the application icon.
+        let slim = !includePlate
         guard let context = NSGraphicsContext.current else { return }
         context.saveGraphicsState()
         context.imageInterpolation = .high
@@ -128,7 +149,18 @@ public struct BatteryShieldIcon: Sendable {
         let ink = monochrome ? NSGradient(colors: [.black, .black]) : Palette.blue
 
         if guardActive {
-            fill(SVGPath.path(Art.shield), with: ink, from: blueStart, to: blueEnd)
+            if slim {
+                let arc = SVGPath.path(Art.shieldOutline)
+                let stroked = arc.cgPath.copy(
+                    strokingWithWidth: Art.shieldStroke,
+                    lineCap: .round,
+                    lineJoin: .round,
+                    miterLimit: 10
+                )
+                fill(NSBezierPath(cgPath: stroked), with: ink, from: blueStart, to: blueEnd)
+            } else {
+                fill(SVGPath.path(Art.shield), with: ink, from: blueStart, to: blueEnd)
+            }
         }
 
         fill(
@@ -138,19 +170,20 @@ public struct BatteryShieldIcon: Sendable {
             to: blueEnd
         )
 
+        let bodyStroke = slim ? Art.slimBodyStroke : Art.bodyStroke
         let body = NSBezierPath(roundedRect: Art.body, xRadius: Art.bodyRadius, yRadius: Art.bodyRadius)
         if includePlate, !monochrome {
             fill(body, with: Palette.cell, from: NSPoint(x: 0, y: Art.body.minY), to: NSPoint(x: 0, y: 806))
         }
         let outline = body.cgPath.copy(
-            strokingWithWidth: Art.bodyStroke,
+            strokingWithWidth: bodyStroke,
             lineCap: .butt,
             lineJoin: .miter,
             miterLimit: 10
         )
         fill(NSBezierPath(cgPath: outline), with: ink, from: blueStart, to: blueEnd)
 
-        let bolt = SVGPath.path(Art.bolt)
+        let bolt = SVGPath.path(slim ? Art.slimBolt : Art.bolt)
         let fraction = min(max(level ?? 0, 0), 100) / 100
         let chargeHeight = Art.window.height * fraction
         // The artwork's y axis runs downward, so the charge sits at the bottom.
@@ -201,7 +234,7 @@ public struct BatteryShieldIcon: Sendable {
                 region.append(
                     NSBezierPath(
                         cgPath: bolt.cgPath.copy(
-                            strokingWithWidth: 22,
+                            strokingWithWidth: 34,
                             lineCap: .round,
                             lineJoin: .round,
                             miterLimit: 10

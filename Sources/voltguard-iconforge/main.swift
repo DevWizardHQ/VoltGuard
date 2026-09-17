@@ -46,6 +46,44 @@ if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "--states" {
     exit(0)
 }
 
+// `--menubar <path>` renders each state at true menu bar size (18pt @2x) and
+// magnifies it without smoothing, which is the only honest way to judge weight.
+if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "--menubar" {
+    let states: [BatteryShieldIcon] = [
+        .init(level: 87, isCharging: true, guardActive: true),
+        .init(level: 87, isCharging: false, guardActive: true),
+        .init(level: 20, isCharging: true, guardActive: true),
+        .init(level: 20, isCharging: false, guardActive: true),
+        .init(level: 87, isCharging: false, guardActive: false),
+    ]
+    let pixels = 36
+    let zoom = 7
+    let tile = pixels * zoom
+    let sheet = NSImage(size: NSSize(width: tile * states.count, height: tile))
+    sheet.lockFocus()
+    NSColor(calibratedWhite: 0.28, alpha: 1).setFill()
+    NSBezierPath(rect: NSRect(x: 0, y: 0, width: tile * states.count, height: tile)).fill()
+    NSGraphicsContext.current?.imageInterpolation = .none
+    for (index, state) in states.enumerated() {
+        guard let data = state.png(pixels: pixels, includePlate: false, monochrome: true),
+            let rep = NSBitmapImageRep(data: data)
+        else { continue }
+        let tinted = NSImage(size: NSSize(width: pixels, height: pixels))
+        tinted.lockFocus()
+        rep.draw(in: NSRect(x: 0, y: 0, width: pixels, height: pixels))
+        NSColor.white.set()
+        NSRect(x: 0, y: 0, width: pixels, height: pixels).fill(using: .sourceAtop)
+        tinted.unlockFocus()
+        tinted.draw(in: NSRect(x: index * tile, y: 0, width: tile, height: tile))
+    }
+    sheet.unlockFocus()
+    try NSBitmapImageRep(data: sheet.tiffRepresentation!)!
+        .representation(using: .png, properties: [:])!
+        .write(to: URL(fileURLWithPath: CommandLine.arguments[2]))
+    print("✓ Wrote \(CommandLine.arguments[2])")
+    exit(0)
+}
+
 let sizes = [16, 32, 128, 256, 512]
 let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 let iconset = root.appendingPathComponent("build-iconset/AppIcon.iconset")

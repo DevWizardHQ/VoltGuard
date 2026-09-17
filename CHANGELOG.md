@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The menu bar mark is drawn with lighter strokes than the application icon,
+  which is what it needs sitting beside Apple's own hairline battery. The
+  shield is stroked as an outline rather than filled as a thick arm, the
+  battery's border is thinner, and the charging bolt is a plainer, larger
+  shape that survives being scaled to 18pt. The application icon is
+  unchanged.
+
 ### Fixed
 
 - The charging bolt was invisible in the menu bar. It was painted in the same
