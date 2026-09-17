@@ -5,48 +5,30 @@ All notable changes to VoltGuard are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.6] - 2026-09-17
 
-### Changed
+### Fixed
 
-- The charging bolt is tinted green rather than punched out of the charge.
-  As a hole it needed the fill behind it and was about two pixels wide at
-  18pt, which is why it kept disappearing; colour carries it instead. A
-  tinted shape cannot be a template image, so the rest of the mark is drawn
-  in white or black to match the menu bar, and it redraws when the system
-  switches appearance.
+- The menu bar icon rendered as a black blob. Tinting the charging bolt ruled
+  out a template image, so the mark picked its own ink from the application's
+  appearance — which is not the menu bar's, and a light-mode app over a dark
+  bar drew black on black. The icon is a template image again and macOS tints
+  it, as it does every other item in the bar.
+- The charging bolt disappeared at both ends of the range: as a knockout it
+  needed the fill behind it, and as a painted shape it vanished into the fill.
+  It is now painted where the cell is empty and punched out where the charge
+  covers it, so it reads at 20% and at 87% alike.
 
 ### Changed
 
 - The menu bar mark is drawn with lighter strokes than the application icon,
-  which is what it needs sitting beside Apple's own hairline battery. The
-  shield is stroked as an outline rather than filled as a thick arm, the
-  battery's border is thinner, and the charging bolt is a plainer, larger
-  shape that survives being scaled to 18pt. The application icon is
-  unchanged.
+  which is what it needs beside Apple's own hairline battery. The shield is
+  stroked as an outline rather than filled as a thick arm, the battery border
+  is thinner, and the bolt is a plainer, larger shape that survives 18pt. The
+  application icon is unchanged.
+- The menu bar icon is monochrome, like every other item in the bar. Level
+  still reads from the fill height. The application icon keeps its colours.
 
-### Fixed
-
-- The charging bolt was invisible in the menu bar. It was painted in the same
-  ink as the charge fill and separated only by a hairline gap, which vanished
-  at menu bar size. Where the fill covers it the bolt is now a hole punched
-  clean through; where the level is too low for the fill to reach it, the
-  bolt is painted instead.
-
-### Changed
-
-- The menu bar icon is a monochrome template image, like every other item in
-  the menu bar. macOS tints it to match the bar in both appearances and while
-  the menu is open, instead of it sitting there as the one coloured icon.
-  Level still reads from the fill height. The application icon keeps its
-  colours.
-
-### Fixed
-
-- The charging bolt disappeared whenever the battery was too low for the
-  charge fill to reach it, because the bolt was only ever drawn as a knockout
-  of that fill. It is now drawn beneath the fill and knocked back out of it,
-  so a charger attached at 20% shows the bolt.
 - The voice list was read once at launch, so a voice downloaded in System
   Settings did not appear until VoltGuard was restarted. It is re-read
   whenever the app becomes active.
@@ -177,7 +159,8 @@ System Settings ▸ Privacy & Security ▸ Open Anyway.
   before anything can be published.
 - A documentation site published to GitHub Pages alongside the appcast.
 
-[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.6
 [0.1.2]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.2
 [0.1.1]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.1
 [0.1.0]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.0

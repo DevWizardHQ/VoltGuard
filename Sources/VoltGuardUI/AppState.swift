@@ -11,13 +11,8 @@ import VoltGuardStore
 public final class AppState {
     public private(set) var status: MonitoringStatus
     public private(set) var voices: [SystemVoice] = []
-    /// What "Automatic" resolves to on this Mac, shown beside the option.
     public private(set) var automaticVoiceName: String?
-    /// Set once at launch so the app knows to present setup.
     public private(set) var needsOnboarding = false
-    /// Bumped when the menu bar switches between light and dark. The status
-    /// icon is tinted, so it is not a template image macOS can invert for us.
-    public private(set) var appearanceTick = 0
     public private(set) var notificationAuthorization: NotificationAuthorization = .authorized
     public private(set) var ruleWarnings: [RuleWarning] = []
     public private(set) var historyIsAvailable = true
@@ -84,9 +79,6 @@ public final class AppState {
         needsOnboarding = !settings.hasCompletedOnboarding
         refreshNotificationAuthorization(requestIfUnasked: true)
 
-        // The user can grant or revoke notifications in System Settings while
-        // VoltGuard is running; without this the menu keeps reporting whatever
-        // was true at launch.
         NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification,
             object: nil,
@@ -94,18 +86,8 @@ public final class AppState {
         ) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.refreshNotificationAuthorization()
-                // Voices downloaded in System Settings while VoltGuard was
-                // running should appear without a relaunch.
                 self?.refreshVoices()
             }
-        }
-
-        DistributedNotificationCenter.default.addObserver(
-            forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.appearanceTick += 1 }
         }
 
         Task { [weak self] in
@@ -161,8 +143,6 @@ public final class AppState {
         Task { _ = await sounds.preview(named: named, customPath: customPath) }
     }
 
-    /// Speaks a rule's own message, filled in with the current battery, so the
-    /// preview is what the user will actually hear.
     public func speak(rule: AlertRule) {
         let context = MessageContext(
             percentage: status.snapshot?.combinedPercentage,
@@ -204,8 +184,6 @@ public final class AppState {
         Diagnostics.report(configurationSummary: configurationSummary)
     }
 
-    /// System Settings ▸ Accessibility ▸ Read & Speak, where macOS voices are
-    /// downloaded. Anything installed there appears in VoltGuard's picker.
     public func openVoiceSettings() {
         guard
             let url = URL(
@@ -225,8 +203,6 @@ public final class AppState {
 
     public var history: HistoryStore? { historyStore }
 
-    /// Retention has to apply to a Mac left running for weeks, not only at
-    /// launch, so the sweep repeats daily.
     private func startRetentionSweep() {
         retentionTask?.cancel()
         retentionTask = Task { [weak self] in
@@ -307,8 +283,6 @@ public final class AppState {
         }
     }
 
-    /// The user can disable the login item in System Settings, so the stored
-    /// preference is reconciled against what SMAppService actually reports.
     private func refreshVoices() {
         voices = speech.availableVoices()
         automaticVoiceName = VoiceCatalog.resolvedName(preferred: nil)

@@ -70,9 +70,7 @@ if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "--menubar" {
                 pixels: pixels,
                 includePlate: false,
                 monochrome: true,
-                ink: .white,
-                boltTint: state.isCharging
-                    ? NSColor(calibratedRed: 0.204, green: 0.780, blue: 0.349, alpha: 1) : nil
+                ink: .white
             ),
             let rep = NSBitmapImageRep(data: data)
         else { continue }
