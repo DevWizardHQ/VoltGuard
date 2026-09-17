@@ -3,12 +3,12 @@
     <channel>
         <title>VoltGuard</title>
         <item>
-            <title>0.1.8</title>
-            <pubDate>Thu, 17 Sep 2026 10:55:15 +0000</pubDate>
-            <sparkle:version>12</sparkle:version>
-            <sparkle:shortVersionString>0.1.8</sparkle:shortVersionString>
+            <title>0.1.9</title>
+            <pubDate>Thu, 17 Sep 2026 11:01:39 +0000</pubDate>
+            <sparkle:version>13</sparkle:version>
+            <sparkle:shortVersionString>0.1.9</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/DevWizardHQ/VoltGuard/releases/latest/download/VoltGuard.zip" length="3017754" type="application/octet-stream" sparkle:edSignature="Ifymo5ApwOQpEHLtL+i+PMf1mW1l7Gq4tG4vLBVxjlw3tmQQDiREArS/CjgAZtH6zkscJQtM4DdYO5y3TX53Cw=="/>
+            <enclosure url="https://github.com/DevWizardHQ/VoltGuard/releases/latest/download/VoltGuard.zip" length="3014739" type="application/octet-stream" sparkle:edSignature="h06EdoW0gLZe5YCrSIQKRNDt3XTHKOumBY24ujs8ec6WrCr8tfWenO7oqPhu7KvCz4fL+8d/9bSmE3hL/rvUDA=="/>
         </item>
     </channel>
 </rss>
