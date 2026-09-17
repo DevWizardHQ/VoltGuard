@@ -5,9 +5,15 @@ All notable changes to VoltGuard are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.10] - 2026-09-17
 
 ### Changed
+
+- The installer background is teal rather than near-black. Finder draws the
+  two icon labels itself in the system label colour, which is black in light
+  appearance, so a background this dark left them unreadable. The heading and
+  footing moved up out of the window's bottom edge, where the second line was
+  being clipped.
 
 - The application icon is white on the dark plate rather than blue and green.
 - The installer background follows the icon's plate instead of ending in a
@@ -186,7 +192,8 @@ System Settings ▸ Privacy & Security ▸ Open Anyway.
   before anything can be published.
 - A documentation site published to GitHub Pages alongside the appcast.
 
-[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.10...HEAD
+[0.1.10]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.10
 [0.1.7]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.7
 [0.1.6]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.6
 [0.1.2]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.2

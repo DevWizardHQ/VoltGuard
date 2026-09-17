@@ -31,21 +31,35 @@ func render(scale: CGFloat) -> Data? {
     func y(_ fromTop: CGFloat) -> CGFloat { height - fromTop }
 
     NSGradient(colors: [
-        NSColor(calibratedRed: 0.086, green: 0.125, blue: 0.180, alpha: 1),
-        NSColor(calibratedRed: 0.055, green: 0.082, blue: 0.122, alpha: 1),
-        NSColor(calibratedRed: 0.027, green: 0.043, blue: 0.067, alpha: 1),
+        NSColor(calibratedRed: 0.208, green: 0.545, blue: 0.525, alpha: 1),
+        NSColor(calibratedRed: 0.137, green: 0.427, blue: 0.424, alpha: 1),
+        NSColor(calibratedRed: 0.082, green: 0.306, blue: 0.318, alpha: 1),
     ])?.draw(in: NSRect(x: 0, y: 0, width: width, height: height), angle: 270)
 
     NSGradient(
-        starting: NSColor(calibratedWhite: 1, alpha: 0.07),
-        ending: NSColor(calibratedWhite: 1, alpha: 0)
+        starting: NSColor(calibratedRed: 0.63, green: 0.95, blue: 0.86, alpha: 0.28),
+        ending: NSColor(calibratedRed: 0.63, green: 0.95, blue: 0.86, alpha: 0)
     )?.draw(
-        fromCenter: NSPoint(x: width / 2, y: height * 0.62),
+        fromCenter: NSPoint(x: width / 2, y: y(40)),
         radius: 0,
-        toCenter: NSPoint(x: width / 2, y: height * 0.62),
-        radius: width * 0.55,
+        toCenter: NSPoint(x: width / 2, y: y(40)),
+        radius: 300,
         options: []
     )
+
+    NSGraphicsContext.saveGraphicsState()
+    let sheen = NSBezierPath()
+    sheen.move(to: NSPoint(x: -120, y: 0))
+    sheen.line(to: NSPoint(x: 240, y: height))
+    sheen.line(to: NSPoint(x: 470, y: height))
+    sheen.line(to: NSPoint(x: 110, y: 0))
+    sheen.close()
+    sheen.addClip()
+    NSGradient(
+        starting: NSColor(calibratedWhite: 1, alpha: 0.05),
+        ending: NSColor(calibratedWhite: 1, alpha: 0)
+    )?.draw(in: NSRect(x: 0, y: 0, width: width, height: height), angle: 90)
+    NSGraphicsContext.restoreGraphicsState()
 
     func draw(_ text: String, size: CGFloat, weight: NSFont.Weight, alpha: CGFloat, topY: CGFloat) {
         let style = NSMutableParagraphStyle()
@@ -59,8 +73,8 @@ func render(scale: CGFloat) -> Data? {
         (text as NSString).draw(in: rect, withAttributes: attributes)
     }
 
-    draw("VoltGuard", size: 32, weight: .regular, alpha: 1.0, topY: 82)
-    draw("Stay charged. Stay informed.", size: 14, weight: .regular, alpha: 0.78, topY: 122)
+    draw("VoltGuard", size: 30, weight: .semibold, alpha: 1.0, topY: 40)
+    draw("Stay charged. Stay informed.", size: 13, weight: .regular, alpha: 0.62, topY: 74)
 
     // Dashed shaft plus a solid head, centred between the icon slots at
     // x = 165 and x = 495.
@@ -82,13 +96,22 @@ func render(scale: CGFloat) -> Data? {
     NSColor(calibratedWhite: 1, alpha: 0.92).setFill()
     head.fill()
 
-    draw("Drag VoltGuard into Applications to install", size: 13, weight: .regular, alpha: 0.92, topY: 340)
+    NSColor(calibratedWhite: 1, alpha: 0.10).setFill()
+    NSBezierPath(rect: NSRect(x: 150, y: y(290), width: 360, height: 1)).fill()
+
+    draw(
+        "Drag VoltGuard into Applications to install",
+        size: 13,
+        weight: .medium,
+        alpha: 0.95,
+        topY: 320
+    )
     draw(
         "First launch: System Settings ▸ Privacy & Security ▸ Open Anyway",
-        size: 13,
+        size: 12,
         weight: .regular,
-        alpha: 0.72,
-        topY: 364
+        alpha: 0.58,
+        topY: 344
     )
 
     NSGraphicsContext.restoreGraphicsState()
