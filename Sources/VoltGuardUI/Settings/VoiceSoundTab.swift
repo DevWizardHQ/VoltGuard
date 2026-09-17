@@ -69,11 +69,25 @@ struct VoiceSoundTab: View {
                         set: { state.settings.voice.voiceIdentifier = $0.isEmpty ? nil : $0 }
                     )
                 ) {
-                    Text("System Default").tag("")
+                    Text(automaticVoiceLabel).tag("")
                     ForEach(state.voices) { voice in
-                        Text("\(voice.name) (\(voice.language))").tag(voice.id)
+                        Text(voice.displayName).tag(voice.id)
                     }
                 }
+                Text(
+                    "Automatic picks the highest-quality voice installed. Siri's voices are reserved by macOS and cannot be used by any third-party app, so choosing one as the system voice has no effect here — download a Premium or Enhanced voice instead."
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+                LabeledContent("More voices") {
+                    Button("Download More Voices…") { state.openVoiceSettings() }
+                }
+                Text(
+                    "Opens System Settings ▸ Accessibility ▸ Read & Speak. Anything you download there appears in this list."
+                )
+                .font(.caption)
+                .foregroundStyle(.secondary)
 
                 VStack(alignment: .leading) {
                     Text("Speech rate: \(Int(state.settings.voice.rate * 100))%")

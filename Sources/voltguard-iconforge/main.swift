@@ -10,7 +10,7 @@ if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "--states" {
     let cases: [(String, BatteryShieldIcon)] = [
         ("100 charging", .init(level: 100, isCharging: true, guardActive: true)),
         ("62 on battery", .init(level: 62, isCharging: false, guardActive: true)),
-        ("25 low", .init(level: 25, isCharging: false, guardActive: true)),
+        ("20 charging", .init(level: 20, isCharging: true, guardActive: true)),
         ("12 critical", .init(level: 12, isCharging: false, guardActive: true)),
         ("paused", .init(level: 62, isCharging: false, guardActive: false)),
     ]
@@ -23,9 +23,20 @@ if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "--states" {
         NSBezierPath(rect: NSRect(x: x, y: tile, width: tile, height: tile)).fill()
         NSColor(calibratedWhite: 0.11, alpha: 1).setFill()
         NSBezierPath(rect: NSRect(x: x, y: 0, width: tile, height: tile)).fill()
-        let image = entry.1.image(size: CGSize(width: 96, height: 96), includePlate: false)
-        image.draw(in: NSRect(x: x + 18, y: tile + 18, width: 96, height: 96))
-        image.draw(in: NSRect(x: x + 18, y: 18, width: 96, height: 96))
+        // Top row: the colour mark. Bottom row: the monochrome menu bar
+        // template, drawn white as macOS would on a dark bar.
+        entry.1.image(size: CGSize(width: 96, height: 96), includePlate: false)
+            .draw(in: NSRect(x: x + 18, y: tile + 18, width: 96, height: 96))
+
+        let template = entry.1.image(
+            size: CGSize(width: 96, height: 96), includePlate: false, monochrome: true)
+        let tinted = NSImage(size: template.size)
+        tinted.lockFocus()
+        template.draw(at: .zero, from: .zero, operation: .sourceOver, fraction: 1)
+        NSColor.white.set()
+        NSRect(origin: .zero, size: template.size).fill(using: .sourceAtop)
+        tinted.unlockFocus()
+        tinted.draw(in: NSRect(x: x + 18, y: 18, width: 96, height: 96))
     }
     sheet.unlockFocus()
     let data = NSBitmapImageRep(data: sheet.tiffRepresentation!)!

@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The menu bar icon is a monochrome template image, like every other item in
+  the menu bar. macOS tints it to match the bar in both appearances and while
+  the menu is open, instead of it sitting there as the one coloured icon.
+  Level still reads from the fill height. The application icon keeps its
+  colours.
+
+### Fixed
+
+- The charging bolt disappeared whenever the battery was too low for the
+  charge fill to reach it, because the bolt was only ever drawn as a knockout
+  of that fill. It is now drawn beneath the fill and knocked back out of it,
+  so a charger attached at 20% shows the bolt.
+- The voice list was read once at launch, so a voice downloaded in System
+  Settings did not appear until VoltGuard was restarted. It is re-read
+  whenever the app becomes active.
+- Corrected the voice defaults. VoltGuard claimed to default to Apple's Siri
+  voice; macOS does not vend Siri voices to third-party apps, so that
+  preference never matched and the app silently used the system default.
+  Automatic now means the highest-quality voice the app can actually use —
+  Premium, then Enhanced — and the UI says so.
+- The voice picker still read "System Default" and listed bare voice names.
+  It now labels the automatic option with the voice it resolves to, shows
+  each voice's quality, and offers a Download More Voices button that opens
+  System Settings ▸ Accessibility ▸ Read & Speak.
+
 ## [0.1.2] - 2026-09-17
 
 ### Added

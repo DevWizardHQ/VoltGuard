@@ -73,8 +73,7 @@ public final class AppState {
             .system,
             "VoltGuard \(Diagnostics.appVersion) (\(Diagnostics.buildNumber)) starting on \(Diagnostics.modelIdentifier)"
         )
-        voices = speech.availableVoices()
-        automaticVoiceName = VoiceCatalog.resolvedName(preferred: nil)
+        refreshVoices()
         applyTheme()
         FileLogSink.shared.isDebugEnabled = settings.debugLogging
         syncLoginItem()
@@ -90,7 +89,12 @@ public final class AppState {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.refreshNotificationAuthorization() }
+            MainActor.assumeIsolated {
+                self?.refreshNotificationAuthorization()
+                // Voices downloaded in System Settings while VoltGuard was
+                // running should appear without a relaunch.
+                self?.refreshVoices()
+            }
         }
 
         Task { [weak self] in
@@ -189,6 +193,16 @@ public final class AppState {
         Diagnostics.report(configurationSummary: configurationSummary)
     }
 
+    /// System Settings ▸ Accessibility ▸ Read & Speak, where macOS voices are
+    /// downloaded. Anything installed there appears in VoltGuard's picker.
+    public func openVoiceSettings() {
+        guard
+            let url = URL(
+                string: "x-apple.systempreferences:com.apple.preference.universalaccess?Speech")
+        else { return }
+        NSWorkspace.shared.open(url)
+    }
+
     public func openNotificationSettings() {
         guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.notifications") else {
             return
@@ -284,6 +298,11 @@ public final class AppState {
 
     /// The user can disable the login item in System Settings, so the stored
     /// preference is reconciled against what SMAppService actually reports.
+    private func refreshVoices() {
+        voices = speech.availableVoices()
+        automaticVoiceName = VoiceCatalog.resolvedName(preferred: nil)
+    }
+
     private func refreshNotificationAuthorization(requestIfUnasked: Bool = false) {
         Task { [weak self] in
             guard let self else { return }

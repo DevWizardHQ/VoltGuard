@@ -3,11 +3,14 @@ import Foundation
 
 /// Chooses which installed voice to speak with.
 ///
-/// The preferred default is Apple's natural Siri voice — "Voice 4" and its
-/// siblings — which is markedly better than the older synthesisers. It only
-/// exists once the user has downloaded it, so the identifier is never
-/// hard-coded: it is resolved against what is actually installed, and falls
-/// back through the best remaining option to the system default.
+/// Automatic means the highest-quality voice macOS offers this app: Premium,
+/// then Enhanced, then the system default.
+///
+/// Siri's own voices are deliberately not part of that. They appear in a
+/// command-line process but macOS does not vend them to third-party apps, so
+/// selecting "Siri (Voice 4)" as the system voice has no effect here. The
+/// preference below is kept in case that ever changes, but nothing should
+/// depend on it.
 public enum VoiceCatalog {
     public static func installed() -> [SystemVoice] {
         AVSpeechSynthesisVoice.speechVoices().map { voice in
@@ -49,6 +52,8 @@ public enum VoiceCatalog {
 
         let siri = candidates.filter { $0.identifier.contains("siri") }
         if let choice = best(siri) { return choice.identifier }
+        // Premium and Enhanced downloads are what a third-party app can
+        // actually use; anything left is the system default.
         return best(candidates.filter { $0.quality != .default })?.identifier
     }
 

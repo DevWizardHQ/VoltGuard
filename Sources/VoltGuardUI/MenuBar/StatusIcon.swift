@@ -12,7 +12,14 @@ public enum StatusIcon {
             isCharging: isPluggedIn(status),
             guardActive: status.state == .active
         )
-        return mark.image(size: CGSize(width: height, height: height), includePlate: false)
+        // A template image, like every other menu bar item: macOS tints it to
+        // match the bar in both appearances and while the menu is open. Level
+        // still reads from the fill height.
+        return mark.image(
+            size: CGSize(width: height, height: height),
+            includePlate: false,
+            monochrome: true
+        )
     }
 
     /// A charger being attached is what the bolt reports, not whether current

@@ -89,9 +89,13 @@ public struct BatteryShieldIcon: Sendable {
 
     // MARK: - Drawing
 
-    /// - Parameter includePlate: true for the application icon, false for the
-    ///   menu bar, which sits directly on the bar and must be transparent.
-    public func draw(in size: CGSize, includePlate: Bool) {
+    /// - Parameters:
+    ///   - includePlate: true for the application icon, false for the menu
+    ///     bar, which sits directly on the bar and must be transparent.
+    ///   - monochrome: draws every shape in one colour for use as a template
+    ///     image, which macOS tints to match the menu bar. Level is still
+    ///     legible from the fill height.
+    public func draw(in size: CGSize, includePlate: Bool, monochrome: Bool = false) {
         guard let context = NSGraphicsContext.current else { return }
         context.saveGraphicsState()
         context.imageInterpolation = .high
@@ -121,19 +125,21 @@ public struct BatteryShieldIcon: Sendable {
             fill(plate, with: Palette.plate, from: NSPoint(x: 0, y: 0), to: NSPoint(x: 0, y: Art.canvas))
         }
 
+        let ink = monochrome ? NSGradient(colors: [.black, .black]) : Palette.blue
+
         if guardActive {
-            fill(SVGPath.path(Art.shield), with: Palette.blue, from: blueStart, to: blueEnd)
+            fill(SVGPath.path(Art.shield), with: ink, from: blueStart, to: blueEnd)
         }
 
         fill(
             NSBezierPath(roundedRect: Art.cap, xRadius: Art.capRadius, yRadius: Art.capRadius),
-            with: Palette.blue,
+            with: ink,
             from: blueStart,
             to: blueEnd
         )
 
         let body = NSBezierPath(roundedRect: Art.body, xRadius: Art.bodyRadius, yRadius: Art.bodyRadius)
-        if includePlate {
+        if includePlate, !monochrome {
             fill(body, with: Palette.cell, from: NSPoint(x: 0, y: Art.body.minY), to: NSPoint(x: 0, y: 806))
         }
         let outline = body.cgPath.copy(
@@ -142,9 +148,27 @@ public struct BatteryShieldIcon: Sendable {
             lineJoin: .miter,
             miterLimit: 10
         )
-        fill(NSBezierPath(cgPath: outline), with: Palette.blue, from: blueStart, to: blueEnd)
+        fill(NSBezierPath(cgPath: outline), with: ink, from: blueStart, to: blueEnd)
 
-        if let level, level > 0, let gradient = Palette.fill(level: level) {
+        let bolt = SVGPath.path(Art.bolt)
+
+        // Drawn beneath the charge, then knocked back out of it. Without the
+        // underlying shape the bolt vanished whenever the level was too low
+        // for the fill to reach it — a charger attached at 20% showed nothing.
+        if isCharging {
+            fill(
+                bolt,
+                with: monochrome ? NSGradient(colors: [.black, .black]) : Palette.bolt,
+                from: NSPoint(x: 411, y: 277),
+                to: NSPoint(x: 641, y: 723)
+            )
+        }
+
+        if let level, level > 0,
+            let gradient = monochrome
+                ? NSGradient(colors: [.black, .black])
+                : Palette.fill(level: level)
+        {
             let fraction = min(max(level, 0), 100) / 100
             let height = Art.window.height * fraction
             let charge = NSRect(
@@ -163,13 +187,11 @@ public struct BatteryShieldIcon: Sendable {
 
             let region = NSBezierPath(rect: charge)
             if isCharging {
-                // Knock the bolt out of the charge with a small halo, so it
-                // stays readable whether it sits above the fill or inside it.
-                let bolt = SVGPath.path(Art.bolt)
+                // A halo keeps the bolt legible where the fill surrounds it.
                 region.append(
                     NSBezierPath(
                         cgPath: bolt.cgPath.copy(
-                            strokingWithWidth: 30,
+                            strokingWithWidth: 44,
                             lineCap: .round,
                             lineJoin: .round,
                             miterLimit: 10
@@ -185,15 +207,6 @@ public struct BatteryShieldIcon: Sendable {
                 options: [.drawsBeforeStartingLocation, .drawsAfterEndingLocation]
             )
             NSGraphicsContext.restoreGraphicsState()
-        }
-
-        if isCharging {
-            fill(
-                SVGPath.path(Art.bolt),
-                with: Palette.bolt,
-                from: NSPoint(x: 411, y: 277),
-                to: NSPoint(x: 641, y: 723)
-            )
         }
 
         context.restoreGraphicsState()
@@ -212,18 +225,20 @@ public struct BatteryShieldIcon: Sendable {
 
     // MARK: - Output
 
-    public func image(size: CGSize, includePlate: Bool) -> NSImage {
+    public func image(size: CGSize, includePlate: Bool, monochrome: Bool = false) -> NSImage {
         let image = NSImage(size: size, flipped: false) { _ in
-            self.draw(in: size, includePlate: includePlate)
+            self.draw(in: size, includePlate: includePlate, monochrome: monochrome)
             return true
         }
-        image.isTemplate = false
+        // A template image is tinted by macOS to match the menu bar, in either
+        // appearance and while the menu is open.
+        image.isTemplate = monochrome
         return image
     }
 
     /// Rendered at exact pixel dimensions: `NSImage.lockFocus` would follow the
     /// display's backing scale and silently double every file.
-    public func png(pixels: Int, includePlate: Bool) -> Data? {
+    public func png(pixels: Int, includePlate: Bool, monochrome: Bool = false) -> Data? {
         guard
             let rep = NSBitmapImageRep(
                 bitmapDataPlanes: nil,
@@ -242,7 +257,7 @@ public struct BatteryShieldIcon: Sendable {
 
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
-        draw(in: CGSize(width: pixels, height: pixels), includePlate: includePlate)
+        draw(in: CGSize(width: pixels, height: pixels), includePlate: includePlate, monochrome: monochrome)
         NSGraphicsContext.restoreGraphicsState()
 
         return rep.representation(using: .png, properties: [:])
