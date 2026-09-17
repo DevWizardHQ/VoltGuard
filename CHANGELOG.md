@@ -7,9 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-17
+
+### Added
+
+- A new icon: a battery inside a guard shield, drawn from
+  `Resources/Assets/battery-shield-icon.svg`. One renderer produces both the
+  application icon and the menu bar glyph, so they cannot drift apart.
+- The menu bar icon now reports state directly: the cell fills to the real
+  battery level and is tinted green, amber or red by how much is left, the
+  bolt appears only while a charger is attached, and the shield disappears
+  while monitoring is paused.
+- Voice alerts gained a tone control alongside rate and volume, and every
+  alert rule has a Listen button that speaks that rule's own message, filled
+  in with the current battery level.
+- The voice now defaults to Apple's natural Siri voice — "Voice 4" — when it
+  is installed, falling back to the best remaining voice and then to the
+  system default. Settings shows which voice Automatic resolves to, and the
+  picker labels each voice with its quality.
+
+### Changed
+
+- New default rules and wording: Critical at 15%, Low at 25%, Charging Warning
+  at 80%, and Full at 100%. Each message names the live battery level, for
+  example "Battery is 15% please connect your device to a power source
+  immediately to avoid shutdown."
+- The installer background follows the new palette.
+- The site's logo and favicon are `site/mark.svg`, generated from the same
+  geometry as the application icon, so the two cannot diverge. It carries its
+  own colours and reads on light and dark backgrounds alike.
+
 ## [0.1.1] - 2026-09-16
 
 ### Fixed
+
+- An open window was unreachable. VoltGuard runs as an accessory app, so it
+  has no Dock icon and no ⌘-Tab entry, and once Settings or the history window
+  was behind something there was no way back to it. The app is now a regular
+  app for exactly as long as a window is on screen, and returns to accessory
+  when the last one closes.
+- Opening a window did not focus it. Activation ran before the window was
+  created, so it arrived un-keyed behind whatever was in front; Settings did
+  not activate the app at all. Activation now happens after the window exists,
+  and the new window is made key.
+- First-run setup never appeared: `hasCompletedOnboarding` was written but
+  never read, so the welcome flow could not open. It is presented on first
+  launch.
 
 - The Settings ▸ Alerts tab was broken: `HSplitView` collapsed the rule list
   to its intrinsic height inside a fixed-size window, so it floated in the
@@ -81,6 +124,7 @@ System Settings ▸ Privacy & Security ▸ Open Anyway.
   before anything can be published.
 - A documentation site published to GitHub Pages alongside the appcast.
 
-[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/DevWizardHQ/VoltGuard/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.2
 [0.1.1]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.1
 [0.1.0]: https://github.com/DevWizardHQ/VoltGuard/releases/tag/v0.1.0

@@ -40,8 +40,12 @@ format: ## Apply formatting
 
 .PHONY: icon
 icon: ## Regenerate the app icon and installer background
-	swift Scripts/make-icon.swift
+	swift run voltguard-iconforge
 	swift Scripts/make-dmg-background.swift
+
+.PHONY: icon-states
+icon-states: ## Render a contact sheet of the menu bar icon states
+	swift run voltguard-iconforge --states dist/icon-states.png
 
 .PHONY: bundle
 bundle: ## Assemble VoltGuard.app

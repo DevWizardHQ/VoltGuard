@@ -11,6 +11,10 @@ import VoltGuardStore
 public final class AppState {
     public private(set) var status: MonitoringStatus
     public private(set) var voices: [SystemVoice] = []
+    /// What "Automatic" resolves to on this Mac, shown beside the option.
+    public private(set) var automaticVoiceName: String?
+    /// Set once at launch so the app knows to present setup.
+    public private(set) var needsOnboarding = false
     public private(set) var notificationAuthorization: NotificationAuthorization = .authorized
     public private(set) var ruleWarnings: [RuleWarning] = []
     public private(set) var historyIsAvailable = true
@@ -70,10 +74,12 @@ public final class AppState {
             "VoltGuard \(Diagnostics.appVersion) (\(Diagnostics.buildNumber)) starting on \(Diagnostics.modelIdentifier)"
         )
         voices = speech.availableVoices()
+        automaticVoiceName = VoiceCatalog.resolvedName(preferred: nil)
         applyTheme()
         FileLogSink.shared.isDebugEnabled = settings.debugLogging
         syncLoginItem()
 
+        needsOnboarding = !settings.hasCompletedOnboarding
         refreshNotificationAuthorization(requestIfUnasked: true)
 
         // The user can grant or revoke notifications in System Settings while
@@ -120,6 +126,10 @@ public final class AppState {
 
     // MARK: - Commands
 
+    public func onboardingPresented() {
+        needsOnboarding = false
+    }
+
     public func togglePause() {
         settings.monitoring.isEnabled.toggle()
     }
@@ -134,6 +144,23 @@ public final class AppState {
 
     public func previewSound(named: String?, customPath: String?) {
         Task { _ = await sounds.preview(named: named, customPath: customPath) }
+    }
+
+    /// Speaks a rule's own message, filled in with the current battery, so the
+    /// preview is what the user will actually hear.
+    public func speak(rule: AlertRule) {
+        let context = MessageContext(
+            percentage: status.snapshot?.combinedPercentage,
+            threshold: rule.threshold,
+            chargingState: status.snapshot?.chargingState ?? .unknown,
+            powerSource: status.snapshot?.powerSource ?? .unknown,
+            date: Date()
+        )
+        let body = MessageTemplate.render(
+            rule.message ?? MessageTemplate.defaultMessage(for: rule),
+            context: context
+        )
+        Task { _ = await speech.speak(body, configuration: settings.voice) }
     }
 
     public func previewVoice() {

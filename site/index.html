@@ -9,7 +9,7 @@
 <meta property="og:description" content="Menu-bar battery monitoring with flexible alert rules, local history, and near-zero idle cost.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://devwizardhq.github.io/VoltGuard/">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 176 60'><g><rect x='0' y='0' width='161' height='60' rx='11' fill='%234EBC73' opacity='.42'/><path d='M0 11a11 11 0 0 1 11-11h94v60H11A11 11 0 0 1 0 49z' fill='%234EBC73'/><path d='M164 17.5h7a5 5 0 0 1 5 5v15a5 5 0 0 1-5 5h-7z' fill='%234EBC73'/><path d='M84.5 14 L70 32.5 h7.5 L73.5 46 L88 27.5 h-7.5 Z' fill='%23fff'/></g></svg>">
+<link rel="icon" href="mark.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Public+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -53,6 +53,7 @@
   /* ---- sidebar as a battery cell: it charges as you read ---- */
   .layout{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:52px;max-width:1180px;margin:0 auto;padding:0 24px}
   .rail{position:sticky;top:24px;align-self:start;padding:24px 0}
+  .mark{display:block;flex:none}
   .brand{display:flex;align-items:center;gap:10px;font-family:"Bricolage Grotesque",sans-serif;font-weight:600;
     font-size:1.05rem;color:var(--paper);text-decoration:none;margin:0 0 16px 2px}
   .brand:hover{color:var(--paper)}
@@ -153,7 +154,7 @@
 
 <nav class="rail" aria-label="Documentation">
   <a class="brand" href="#top">
-    <svg width="30" height="11" viewBox="0 0 176 60" aria-hidden="true"><rect x="0" y="0" width="161" height="60" rx="11" fill="#4EBC73" opacity=".42"/><path d="M0 11a11 11 0 0 1 11-11h94v60H11A11 11 0 0 1 0 49z" fill="#4EBC73"/><path d="M164 17.5h7a5 5 0 0 1 5 5v15a5 5 0 0 1-5 5h-7z" fill="#4EBC73"/><path d="M84.5 14 L70 32.5 h7.5 L73.5 46 L88 27.5 h-7.5 Z" fill="#fff"/></svg>
+    <img class="mark" src="mark.svg" width="30" height="30" alt="">
     VoltGuard
   </a>
   <div class="cell">
@@ -193,7 +194,7 @@
     <div class="menubar">
       <span class="dim" style="color:var(--muted)">Wed 13:42</span>
       <span class="glyph">
-        <svg width="17" height="11" viewBox="0 0 26 14" aria-hidden="true"><rect x="1" y="1" width="19" height="12" rx="3" fill="none" stroke="#4ade80" stroke-width="1.6"/><rect x="21.5" y="4.5" width="2" height="5" rx="1" fill="#4ade80"/><path d="M12.4 2.2 L7.6 8.4 h3 l-1 3.6 L14.6 6 h-3 z" fill="#fbbf24"/></svg>
+        <img src="mark.svg" width="14" height="14" alt="">
         81%
       </span>
     </div>
@@ -240,7 +241,7 @@
     </li>
     <li>
       <h3>Answer five questions</h3>
-      <p>Setup asks for your thresholds, how you want to be alerted, how often to check, and whether to start at login. Skip it and you get sensible defaults: warn at 20% on battery, 10% critical, 80% while charging.</p>
+      <p>Setup asks for your thresholds, how you want to be alerted, how often to check, and whether to start at login. Skip it and you get sensible defaults: critical at 15% and low at 25% on battery, a charging warning at 80%, and a note when it reaches 100%.</p>
     </li>
   </ol>
   <p class="note"><strong>Prefer to build it yourself?</strong> <code>git clone</code>, then <code>make bundle</code>. A locally built copy is signed on your machine and never shows the Gatekeeper prompt.</p>
@@ -275,10 +276,10 @@
   <table>
     <thead><tr><th>Rule</th><th>Fires when</th><th>Default</th></tr></thead>
     <tbody>
-      <tr><td>Low Warning</td><td>at or below 20%, on battery</td><td>On</td></tr>
-      <tr><td>Critical Low</td><td>at or below 10%, on battery</td><td>On, repeats every 5 min</td></tr>
-      <tr><td>High Warning</td><td>at or above 80%, plugged in</td><td>On</td></tr>
-      <tr><td>Critical High</td><td>at or above 90%, plugged in</td><td>Off</td></tr>
+      <tr><td>Critical</td><td>at or below 15%, on battery</td><td>On, repeats every 5 min</td></tr>
+      <tr><td>Low</td><td>at or below 25%, on battery</td><td>On</td></tr>
+      <tr><td>Charging Warning</td><td>at or above 80%, plugged in</td><td>On</td></tr>
+      <tr><td>Full</td><td>at 100%, plugged in</td><td>On, once per charge</td></tr>
     </tbody>
   </table>
   <h3 class="sub">Each rule has five knobs</h3>
@@ -307,7 +308,7 @@
     <dt>Sound</dt>
     <dd>Any built-in alert sound, or your own audio file. If both notification and sound are on, the sound rides on the notification — you hear one sound, not two.</dd>
     <dt>Voice</dt>
-    <dd>Speaks the message aloud using any installed system voice, with adjustable rate and volume.</dd>
+    <dd>Speaks the message aloud using any installed system voice, with adjustable rate, volume and tone. Each rule has a Listen button so you can hear its message before it ever fires.</dd>
     <dt>Dialog</dt>
     <dd>A modal alert for things you must not miss. Only one appears at a time, and it never blocks monitoring.</dd>
   </dl>

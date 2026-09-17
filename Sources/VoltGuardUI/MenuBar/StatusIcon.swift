@@ -1,28 +1,24 @@
 import SwiftUI
 import VoltGuardCore
+import VoltGuardIcon
 
 public enum StatusIcon {
-    public static func symbolName(for status: MonitoringStatus) -> String {
-        switch status.state {
-        case .pausedByUser: return "pause.circle"
-        case .outsideSchedule: return "moon.zzz"
-        case .systemAsleep: return "moon.zzz"
-        case .degraded: return "exclamationmark.triangle"
-        case .noBatteryMac: return "desktopcomputer"
-        case .active: break
-        }
+    /// The menu bar draws the same mark as the app icon, minus its plate: the
+    /// shield shows while the guard is watching, the bolt while a charger is
+    /// attached, and the cell fills to the real level.
+    public static func image(for status: MonitoringStatus, height: CGFloat = 18) -> NSImage {
+        let mark = BatteryShieldIcon(
+            level: status.snapshot?.combinedPercentage.map(Double.init),
+            isCharging: isPluggedIn(status),
+            guardActive: status.state == .active
+        )
+        return mark.image(size: CGSize(width: height, height: height), includePlate: false)
+    }
 
-        guard let snapshot = status.snapshot, let percentage = snapshot.combinedPercentage else {
-            return "battery.50"
-        }
-        if snapshot.chargingState.isCharging { return "battery.100percent.bolt" }
-        switch percentage {
-        case ..<10: return "battery.0"
-        case ..<25: return "battery.25"
-        case ..<60: return "battery.50"
-        case ..<85: return "battery.75"
-        default: return "battery.100"
-        }
+    /// A charger being attached is what the bolt reports, not whether current
+    /// is flowing: a full battery on mains is still plugged in.
+    private static func isPluggedIn(_ status: MonitoringStatus) -> Bool {
+        status.snapshot?.powerSource == .ac
     }
 
     public static func accessibilityLabel(for status: MonitoringStatus) -> String {

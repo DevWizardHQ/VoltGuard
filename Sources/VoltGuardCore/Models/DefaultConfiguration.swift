@@ -18,31 +18,38 @@ public enum DefaultConfiguration {
     public static var rules: [AlertRule] {
         [
             AlertRule(
-                name: "Low Warning",
-                threshold: 20,
-                direction: .low,
-                powerCondition: .onBatteryOnly
-            ),
-            AlertRule(
-                name: "Critical Low",
-                threshold: 10,
+                name: "Critical",
+                threshold: 15,
                 direction: .low,
                 powerCondition: .onBatteryOnly,
                 channels: [.notification, .sound, .voice],
+                message:
+                    "Battery is {battery} please connect your device to a power source immediately to avoid shutdown.",
                 repetition: .interval(300)
             ),
             AlertRule(
-                name: "High Warning",
-                threshold: 80,
-                direction: .high,
-                powerCondition: .onACOnly
+                name: "Low",
+                threshold: 25,
+                direction: .low,
+                powerCondition: .onBatteryOnly,
+                message: "Battery is {battery} please connect your device to a power source soon."
             ),
             AlertRule(
-                name: "Critical High",
-                isEnabled: false,
-                threshold: 90,
+                name: "Charging Warning",
+                threshold: 80,
                 direction: .high,
-                powerCondition: .onACOnly
+                powerCondition: .onACOnly,
+                message:
+                    "Battery is {battery} please disconnect your device from the power source to avoid overcharging."
+            ),
+            AlertRule(
+                name: "Full",
+                threshold: 100,
+                direction: .high,
+                powerCondition: .onACOnly,
+                message:
+                    "Battery is {battery} your device is fully charged and can be disconnected from the power source.",
+                repetition: .once
             ),
         ]
     }

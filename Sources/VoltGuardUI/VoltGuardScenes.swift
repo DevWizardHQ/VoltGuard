@@ -43,11 +43,12 @@ public struct VoltGuardScenes: Scene {
 
 private struct MenuBarLabel: View {
     let state: AppState
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         let status = state.status
         HStack(spacing: 4) {
-            Image(systemName: StatusIcon.symbolName(for: status))
+            Image(nsImage: StatusIcon.image(for: status))
             if let text = StatusIcon.menuBarText(
                 for: status, showPercentage: state.settings.showPercentageInMenuBar)
             {
@@ -55,5 +56,12 @@ private struct MenuBarLabel: View {
             }
         }
         .accessibilityLabel(StatusIcon.accessibilityLabel(for: status))
+        .task {
+            guard state.needsOnboarding else { return }
+            state.onboardingPresented()
+            WindowActivation.prepareForWindow()
+            openWindow(id: "onboarding")
+            WindowActivation.focusNewestWindow()
+        }
     }
 }

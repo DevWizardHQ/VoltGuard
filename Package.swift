@@ -14,7 +14,7 @@ let appProducts: [Product] = coreOnly ? [] : [
 let appTargets: [Target] = coreOnly ? [] : [
     .target(
         name: "VoltGuardUI",
-        dependencies: ["VoltGuardCore", "VoltGuardStore", "VoltGuardPlatform"],
+        dependencies: ["VoltGuardCore", "VoltGuardStore", "VoltGuardPlatform", "VoltGuardIcon"],
         swiftSettings: [.swiftLanguageMode(.v5)]
     ),
     .executableTarget(
@@ -30,6 +30,7 @@ let package = Package(
     products: appProducts + [
         .library(name: "VoltGuardCore", targets: ["VoltGuardCore"]),
         .executable(name: "voltguard-selftest", targets: ["voltguard-selftest"]),
+        .executable(name: "voltguard-iconforge", targets: ["voltguard-iconforge"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.4")
@@ -51,6 +52,15 @@ let package = Package(
                 "VoltGuardStore",
                 .product(name: "Sparkle", package: "Sparkle"),
             ],
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        .target(
+            name: "VoltGuardIcon",
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        .executableTarget(
+            name: "voltguard-iconforge",
+            dependencies: ["VoltGuardIcon"],
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
         .executableTarget(

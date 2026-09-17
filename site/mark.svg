@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="VoltGuard">
+  <defs>
+    <linearGradient id="blue" gradientUnits="userSpaceOnUse" x1="0" y1="120" x2="0" y2="935">
+      <stop offset="0" stop-color="#5BD1FB"/>
+      <stop offset=".45" stop-color="#2E8CFF"/>
+      <stop offset="1" stop-color="#1663F5"/>
+    </linearGradient>
+    <linearGradient id="charge" gradientUnits="userSpaceOnUse" x1="362" y1="252" x2="659" y2="774">
+      <stop offset="0" stop-color="#A8E85E"/>
+      <stop offset="1" stop-color="#35CE7C"/>
+    </linearGradient>
+    <mask id="boltOut">
+      <rect x="0" y="0" width="1024" height="1024" fill="#fff"/>
+      <path d="M487 533 L525 419 H411 L538 277 L500 391 H614 Z" fill="#000" stroke="#000" stroke-width="30" stroke-linejoin="round"/>
+    </mask>
+  </defs>
+
+  <path fill="url(#blue)" d="M132 302 C124 330 119 390 124 440 C128 520 158 600 206 678 C232 720 275 775 324 822 C370 860 440 900 512 934 C584 900 654 860 700 822 C749 775 792 720 818 678 C866 600 896 520 900 440 C905 390 900 330 892 302 L742 236 C762 270 814 312 830 346 C828 392 826 440 813 488 C798 545 774 612 731 678 C694 730 644 786 586 828 C562 845 536 858 512 862 C488 858 462 845 438 828 C380 786 330 730 293 678 C250 612 226 545 211 488 C198 440 196 392 194 346 C210 312 262 270 282 236 Z"/>
+
+  <rect x="413" y="120" width="198" height="100" rx="34" fill="url(#blue)"/>
+  <rect x="329.5" y="219" width="361.5" height="587" rx="70" fill="#0E1826" stroke="url(#blue)" stroke-width="40"/>
+
+  <rect x="362" y="252" width="297" height="522" rx="36" fill="url(#charge)" mask="url(#boltOut)"/>
+</svg>

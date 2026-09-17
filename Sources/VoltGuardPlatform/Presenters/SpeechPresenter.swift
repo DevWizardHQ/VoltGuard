@@ -7,23 +7,27 @@ public final class SpeechPresenter: SpeechPresenting, @unchecked Sendable {
     public init() {}
 
     public func availableVoices() -> [SystemVoice] {
-        AVSpeechSynthesisVoice.speechVoices()
-            .map { SystemVoice(id: $0.identifier, name: $0.name, language: $0.language) }
-            .sorted { $0.name < $1.name }
+        VoiceCatalog.installed().sorted {
+            if $0.isSiri != $1.isSiri { return $0.isSiri }
+            return $0.name.localizedStandardCompare($1.name) == .orderedAscending
+        }
     }
 
     public func speak(_ text: String, configuration: VoiceConfiguration) async -> ChannelOutcome {
         let utterance = AVSpeechUtterance(string: text)
         utterance.volume = configuration.volume
+        utterance.pitchMultiplier = configuration.pitch
         utterance.rate =
             AVSpeechUtteranceMinimumSpeechRate
             + (AVSpeechUtteranceMaximumSpeechRate - AVSpeechUtteranceMinimumSpeechRate) * configuration.rate
 
-        if let identifier = configuration.voiceIdentifier {
+        // Automatic resolves to the best installed voice — Siri's natural
+        // voice when it is there — and an uninstalled explicit choice falls
+        // back rather than failing the alert.
+        if let identifier = VoiceCatalog.resolve(preferred: configuration.voiceIdentifier) {
             if let voice = AVSpeechSynthesisVoice(identifier: identifier) {
                 utterance.voice = voice
             } else {
-                // An uninstalled voice falls back rather than failing the alert.
                 Log.warning(.alerts, "Voice \(identifier) unavailable; using the system default")
             }
         }

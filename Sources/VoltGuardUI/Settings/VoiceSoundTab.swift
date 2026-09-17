@@ -89,6 +89,13 @@ struct VoiceSoundTab: View {
                         .accessibilityValue("\(Int(state.settings.voice.volume * 100)) percent")
                 }
 
+                VStack(alignment: .leading) {
+                    Text("Tone: \(toneDescription)")
+                    Slider(value: $state.settings.voice.pitch, in: 0.5...2)
+                        .accessibilityLabel("Speech tone")
+                        .accessibilityValue(toneDescription)
+                }
+
                 HStack {
                     Button("Test Voice") { state.previewVoice() }
                     Button("Reset to Default") { state.settings.voice = VoiceConfiguration() }
@@ -96,6 +103,21 @@ struct VoiceSoundTab: View {
             }
         }
         .formStyle(.grouped)
+    }
+
+    private var automaticVoiceLabel: String {
+        guard let name = state.automaticVoiceName else { return "Automatic" }
+        return "Automatic — \(name)"
+    }
+
+    private var toneDescription: String {
+        let pitch = state.settings.voice.pitch
+        switch pitch {
+        case ..<0.85: return "Deeper"
+        case ..<1.15: return "Natural"
+        case ..<1.6: return "Higher"
+        default: return "Highest"
+        }
     }
 
     private func chooseSound() {

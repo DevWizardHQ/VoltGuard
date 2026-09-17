@@ -31,9 +31,9 @@ func render(scale: CGFloat) -> Data? {
     func y(_ fromTop: CGFloat) -> CGFloat { height - fromTop }
 
     NSGradient(colors: [
-        NSColor(calibratedRed: 0.043, green: 0.063, blue: 0.094, alpha: 1),
-        NSColor(calibratedRed: 0.063, green: 0.180, blue: 0.129, alpha: 1),
-        NSColor(calibratedRed: 0.145, green: 0.353, blue: 0.220, alpha: 1),
+        NSColor(calibratedRed: 0.035, green: 0.055, blue: 0.082, alpha: 1),
+        NSColor(calibratedRed: 0.078, green: 0.114, blue: 0.165, alpha: 1),
+        NSColor(calibratedRed: 0.118, green: 0.275, blue: 0.545, alpha: 1),
     ])?.draw(in: NSRect(x: 0, y: 0, width: width, height: height), angle: 270)
 
     func draw(_ text: String, size: CGFloat, weight: NSFont.Weight, alpha: CGFloat, topY: CGFloat) {

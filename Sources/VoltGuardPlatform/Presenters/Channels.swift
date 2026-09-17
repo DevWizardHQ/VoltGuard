@@ -39,10 +39,19 @@ public struct SystemVoice: Identifiable, Hashable, Sendable {
     public let id: String
     public let name: String
     public let language: String
+    public let quality: String
+    /// Apple's natural Siri voices, which sound markedly better than the rest.
+    public let isSiri: Bool
 
-    public init(id: String, name: String, language: String) {
+    public init(id: String, name: String, language: String, quality: String, isSiri: Bool) {
         self.id = id
         self.name = name
         self.language = language
+        self.quality = quality
+        self.isSiri = isSiri
+    }
+
+    public var displayName: String {
+        quality == "Default" ? "\(name) — \(language)" : "\(name) (\(quality)) — \(language)"
     }
 }

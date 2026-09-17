@@ -34,6 +34,24 @@ struct VoltGuardApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.accessory)
+
+        // Closing the last window gives the Dock icon back up.
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: nil,
+            queue: .main
+        ) { _ in
+            MainActor.assumeIsolated { WindowActivation.windowDidClose() }
+        }
+    }
+
+    /// Clicking the Dock icon with no window open should bring something back
+    /// rather than doing nothing.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        if !hasVisibleWindows {
+            NSApplication.shared.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        }
+        return true
     }
 }
 

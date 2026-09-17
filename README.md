@@ -27,7 +27,8 @@ and never uploads a thing.
 - **Charging-aware.** A 20% battery only warns you when you are actually running
   on battery; an 80% warning only fires while plugged in.
 - **Four alert channels.** Notification, sound, spoken voice, and dialog, chosen
-  per rule and independently switchable.
+  per rule and independently switchable. The voice has adjustable rate, volume
+  and tone, and every rule can be previewed aloud.
 - **No alert spam.** Alerts latch on entry, release only after the level clears
   the threshold by a margin, and repeat only as often as you configure.
 - **Schedules.** Restrict monitoring to working hours, overnight windows, or any
@@ -142,10 +143,10 @@ Defaults on first launch:
 | Setting | Default |
 |---|---|
 | Monitoring interval | 10 minutes |
-| Low Warning | 20%, on battery |
-| Critical Low | 10%, on battery |
-| High Warning | 80%, plugged in |
-| Critical High | 90%, disabled |
+| Critical | 15%, on battery |
+| Low | 25%, on battery |
+| Charging Warning | 80%, plugged in |
+| Full | 100%, plugged in |
 | Channels | Notification + Sound |
 | Repeat | Every 10 minutes |
 | Schedule | Always active |

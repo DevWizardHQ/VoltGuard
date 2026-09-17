@@ -37,7 +37,11 @@ public struct MenuBarContent: View {
             Button("Statistics") { open(tab: .statistics) }
             Divider()
 
-            Button("Settings…") { openSettings() }
+            Button("Settings…") {
+                WindowActivation.prepareForWindow()
+                openSettings()
+                WindowActivation.focusNewestWindow()
+            }
             Divider()
 
             Button("Quit VoltGuard") { NSApplication.shared.terminate(nil) }
@@ -73,7 +77,8 @@ public struct MenuBarContent: View {
     }
 
     private func open(tab: MainWindowTab) {
-        NSApplication.shared.activate(ignoringOtherApps: true)
+        WindowActivation.prepareForWindow()
         openWindow(id: MainWindowTab.windowID, value: tab)
+        WindowActivation.focusNewestWindow()
     }
 }

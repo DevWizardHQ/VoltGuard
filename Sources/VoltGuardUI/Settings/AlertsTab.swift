@@ -163,8 +163,17 @@ private struct RuleEditor: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                Button("Reset to Default") { rule.message = nil }
-                    .disabled(rule.message == nil)
+                HStack {
+                    Button("Listen") { state.speak(rule: rule) }
+                        .disabled(!rule.channels.contains(.voice))
+                    Button("Reset to Default") { rule.message = nil }
+                        .disabled(rule.message == nil)
+                }
+                if !rule.channels.contains(.voice) {
+                    Text("Turn on the Voice channel above to hear this message.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .formStyle(.grouped)

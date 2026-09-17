@@ -28,9 +28,9 @@ public enum MessageTemplate {
     public static func defaultMessage(for rule: AlertRule) -> String {
         switch rule.direction {
         case .low:
-            "Battery is at {battery}, at or below your {threshold} threshold. Please connect the charger."
+            "Battery is {battery} please connect your device to a power source."
         case .high:
-            "Battery is at {battery}, at or above your {threshold} threshold. You can disconnect the charger."
+            "Battery is {battery} you can disconnect your device from the power source."
         }
     }
 
