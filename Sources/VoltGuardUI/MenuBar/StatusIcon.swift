@@ -12,14 +12,27 @@ public enum StatusIcon {
             isCharging: isPluggedIn(status),
             guardActive: status.state == .active
         )
-        // A template image, like every other menu bar item: macOS tints it to
-        // match the bar in both appearances and while the menu is open. Level
-        // still reads from the fill height.
+        // Monochrome like every other menu bar item, except the charging bolt,
+        // which is tinted green so it reads at 18pt. A tinted shape cannot be
+        // a template image, so the ink follows the menu bar's appearance.
         return mark.image(
             size: CGSize(width: height, height: height),
             includePlate: false,
-            monochrome: true
+            monochrome: true,
+            ink: menuBarInk(),
+            boltTint: isPluggedIn(status) ? Self.chargingTint : nil
         )
+    }
+
+    /// Apple's system green, the colour macOS itself uses for charging.
+    private static let chargingTint = NSColor(
+        calibratedRed: 0.204, green: 0.780, blue: 0.349, alpha: 1)
+
+    private static func menuBarInk() -> NSColor {
+        let dark =
+            NSApplication.shared.effectiveAppearance
+            .bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+        return dark ? .white : .black
     }
 
     /// A charger being attached is what the bolt reports, not whether current

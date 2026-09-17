@@ -65,16 +65,21 @@ if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "--menubar" {
     NSBezierPath(rect: NSRect(x: 0, y: 0, width: tile * states.count, height: tile)).fill()
     NSGraphicsContext.current?.imageInterpolation = .none
     for (index, state) in states.enumerated() {
-        guard let data = state.png(pixels: pixels, includePlate: false, monochrome: true),
+        guard
+            let data = state.png(
+                pixels: pixels,
+                includePlate: false,
+                monochrome: true,
+                ink: .white,
+                boltTint: state.isCharging
+                    ? NSColor(calibratedRed: 0.204, green: 0.780, blue: 0.349, alpha: 1) : nil
+            ),
             let rep = NSBitmapImageRep(data: data)
         else { continue }
-        let tinted = NSImage(size: NSSize(width: pixels, height: pixels))
-        tinted.lockFocus()
-        rep.draw(in: NSRect(x: 0, y: 0, width: pixels, height: pixels))
-        NSColor.white.set()
-        NSRect(x: 0, y: 0, width: pixels, height: pixels).fill(using: .sourceAtop)
-        tinted.unlockFocus()
-        tinted.draw(in: NSRect(x: index * tile, y: 0, width: tile, height: tile))
+        NSImage(size: NSSize(width: pixels, height: pixels), flipped: false) { rect in
+            rep.draw(in: rect)
+            return true
+        }.draw(in: NSRect(x: index * tile, y: 0, width: tile, height: tile))
     }
     sheet.unlockFocus()
     try NSBitmapImageRep(data: sheet.tiffRepresentation!)!

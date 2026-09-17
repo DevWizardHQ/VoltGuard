@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The charging bolt is tinted green rather than punched out of the charge.
+  As a hole it needed the fill behind it and was about two pixels wide at
+  18pt, which is why it kept disappearing; colour carries it instead. A
+  tinted shape cannot be a template image, so the rest of the mark is drawn
+  in white or black to match the menu bar, and it redraws when the system
+  switches appearance.
+
+### Changed
+
 - The menu bar mark is drawn with lighter strokes than the application icon,
   which is what it needs sitting beside Apple's own hairline battery. The
   shield is stroked as an outline rather than filled as a thick arm, the

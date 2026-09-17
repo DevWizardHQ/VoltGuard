@@ -113,7 +113,13 @@ public struct BatteryShieldIcon: Sendable {
     ///   - monochrome: draws every shape in one colour for use as a template
     ///     image, which macOS tints to match the menu bar. Level is still
     ///     legible from the fill height.
-    public func draw(in size: CGSize, includePlate: Bool, monochrome: Bool = false) {
+    public func draw(
+        in size: CGSize,
+        includePlate: Bool,
+        monochrome: Bool = false,
+        ink inkColor: NSColor = .black,
+        boltTint: NSColor? = nil
+    ) {
         // The menu bar sits next to Apple's own hairline battery, so the mark
         // is drawn with lighter strokes there than on the application icon.
         let slim = !includePlate
@@ -146,7 +152,7 @@ public struct BatteryShieldIcon: Sendable {
             fill(plate, with: Palette.plate, from: NSPoint(x: 0, y: 0), to: NSPoint(x: 0, y: Art.canvas))
         }
 
-        let ink = monochrome ? NSGradient(colors: [.black, .black]) : Palette.blue
+        let ink = monochrome ? NSGradient(colors: [inkColor, inkColor]) : Palette.blue
 
         if guardActive {
             if slim {
@@ -194,10 +200,10 @@ public struct BatteryShieldIcon: Sendable {
             height: chargeHeight
         )
 
-        // Above the charge the bolt is painted; within it the bolt is a hole
-        // punched clean through. Painting it in the same ink as the fill and
-        // relying on a hairline gap made it vanish at menu bar size.
-        if isCharging, charge.minY > Art.window.minY {
+        // Untinted, the bolt is painted above the charge and punched out of
+        // it, because it shares the fill's ink. A tinted bolt needs neither:
+        // it is drawn over the finished cell further down.
+        if isCharging, boltTint == nil, charge.minY > Art.window.minY {
             NSGraphicsContext.saveGraphicsState()
             NSBezierPath(
                 rect: NSRect(
@@ -209,7 +215,7 @@ public struct BatteryShieldIcon: Sendable {
             ).addClip()
             fill(
                 bolt,
-                with: monochrome ? NSGradient(colors: [.black, .black]) : Palette.bolt,
+                with: boltGradient(monochrome: monochrome, ink: inkColor, tint: boltTint),
                 from: NSPoint(x: 411, y: 277),
                 to: NSPoint(x: 641, y: 723)
             )
@@ -218,7 +224,7 @@ public struct BatteryShieldIcon: Sendable {
 
         if let level, level > 0,
             let gradient = monochrome
-                ? NSGradient(colors: [.black, .black])
+                ? NSGradient(colors: [inkColor, inkColor])
                 : Palette.fill(level: level)
         {
             NSGraphicsContext.saveGraphicsState()
@@ -229,7 +235,7 @@ public struct BatteryShieldIcon: Sendable {
             ).addClip()
 
             let region = NSBezierPath(rect: charge)
-            if isCharging {
+            if isCharging, boltTint == nil {
                 // Slightly inflated so the hole survives being scaled to 18pt.
                 region.append(
                     NSBezierPath(
@@ -252,7 +258,28 @@ public struct BatteryShieldIcon: Sendable {
             NSGraphicsContext.restoreGraphicsState()
         }
 
+        if let tint = boltTint, isCharging {
+            NSGraphicsContext.saveGraphicsState()
+            NSBezierPath(
+                roundedRect: Art.window,
+                xRadius: Art.windowRadius,
+                yRadius: Art.windowRadius
+            ).addClip()
+            fill(
+                bolt,
+                with: NSGradient(colors: [tint, tint]),
+                from: NSPoint(x: Art.window.minX, y: Art.window.minY),
+                to: NSPoint(x: Art.window.maxX, y: Art.window.maxY)
+            )
+            NSGraphicsContext.restoreGraphicsState()
+        }
+
         context.restoreGraphicsState()
+    }
+
+    private func boltGradient(monochrome: Bool, ink: NSColor, tint: NSColor?) -> NSGradient? {
+        if let tint { return NSGradient(colors: [tint, tint]) }
+        return monochrome ? NSGradient(colors: [ink, ink]) : Palette.bolt
     }
 
     private var blueStart: NSPoint { NSPoint(x: 0, y: 120) }
@@ -268,20 +295,40 @@ public struct BatteryShieldIcon: Sendable {
 
     // MARK: - Output
 
-    public func image(size: CGSize, includePlate: Bool, monochrome: Bool = false) -> NSImage {
+    public func image(
+        size: CGSize,
+        includePlate: Bool,
+        monochrome: Bool = false,
+        ink: NSColor = .black,
+        boltTint: NSColor? = nil
+    ) -> NSImage {
         let image = NSImage(size: size, flipped: false) { _ in
-            self.draw(in: size, includePlate: includePlate, monochrome: monochrome)
+            self.draw(
+                in: size,
+                includePlate: includePlate,
+                monochrome: monochrome,
+                ink: ink,
+                boltTint: boltTint
+            )
             return true
         }
         // A template image is tinted by macOS to match the menu bar, in either
         // appearance and while the menu is open.
-        image.isTemplate = monochrome
+        // A tinted bolt rules out a template image, which macOS would flatten
+        // to one colour; the ink is chosen for the current appearance instead.
+        image.isTemplate = monochrome && boltTint == nil
         return image
     }
 
     /// Rendered at exact pixel dimensions: `NSImage.lockFocus` would follow the
     /// display's backing scale and silently double every file.
-    public func png(pixels: Int, includePlate: Bool, monochrome: Bool = false) -> Data? {
+    public func png(
+        pixels: Int,
+        includePlate: Bool,
+        monochrome: Bool = false,
+        ink: NSColor = .black,
+        boltTint: NSColor? = nil
+    ) -> Data? {
         guard
             let rep = NSBitmapImageRep(
                 bitmapDataPlanes: nil,
@@ -300,7 +347,13 @@ public struct BatteryShieldIcon: Sendable {
 
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
-        draw(in: CGSize(width: pixels, height: pixels), includePlate: includePlate, monochrome: monochrome)
+        draw(
+            in: CGSize(width: pixels, height: pixels),
+            includePlate: includePlate,
+            monochrome: monochrome,
+            ink: ink,
+            boltTint: boltTint
+        )
         NSGraphicsContext.restoreGraphicsState()
 
         return rep.representation(using: .png, properties: [:])

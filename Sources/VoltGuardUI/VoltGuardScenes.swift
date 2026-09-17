@@ -46,6 +46,8 @@ private struct MenuBarLabel: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
+        // Read so a light/dark switch redraws the tinted icon.
+        _ = state.appearanceTick
         let status = state.status
         HStack(spacing: 4) {
             Image(nsImage: StatusIcon.image(for: status))

@@ -15,6 +15,9 @@ public final class AppState {
     public private(set) var automaticVoiceName: String?
     /// Set once at launch so the app knows to present setup.
     public private(set) var needsOnboarding = false
+    /// Bumped when the menu bar switches between light and dark. The status
+    /// icon is tinted, so it is not a template image macOS can invert for us.
+    public private(set) var appearanceTick = 0
     public private(set) var notificationAuthorization: NotificationAuthorization = .authorized
     public private(set) var ruleWarnings: [RuleWarning] = []
     public private(set) var historyIsAvailable = true
@@ -95,6 +98,14 @@ public final class AppState {
                 // running should appear without a relaunch.
                 self?.refreshVoices()
             }
+        }
+
+        DistributedNotificationCenter.default.addObserver(
+            forName: Notification.Name("AppleInterfaceThemeChangedNotification"),
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.appearanceTick += 1 }
         }
 
         Task { [weak self] in
